@@ -1,0 +1,189 @@
+.wrapper {
+  display: grid;
+  grid-template: auto 1fr / 1fr;
+  height: 100dvh;
+}
+
+.menuBlock {
+  box-shadow: 0 0 4px #3c4043;
+  display: flex;
+  justify-content: center;
+}
+
+.menuInner {
+  align-items: center;
+  display: flex;
+  gap: 24px;
+  max-width: 1280px;
+  padding: 12px 24px;
+  width: 100%;
+}
+
+.reserveLabel,
+.startLabel,
+.waitLabel {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.reserveLabel::before,
+.startLabel::before,
+.waitLabel::before {
+  border-radius: 50%;
+  content: "";
+  display: block;
+  height: 12px;
+  width: 12px;
+}
+
+.reserveLabel::before {
+  background: #ead665;
+}
+
+.startLabel::before {
+  background: #1a73e8;
+}
+
+.waitLabel::before {
+  background: #61d345;
+}
+
+.button {
+  background: #1a73e8;
+  border-radius: 4px;
+  color: #fff;
+  height: 36px;
+  padding: 0 12px;
+  transition: 120ms;
+}
+
+.button:disabled {
+  opacity: 0.25;
+}
+
+.inner {
+  display: grid;
+  gap: 24px;
+  grid-template: 1fr 15dvh / 1fr;
+  justify-self: center;
+  max-width: 1280px;
+  padding: 24px 24px 0;
+  width: 100%;
+}
+
+.membersBlock {
+  display: grid;
+}
+
+.list {
+  display: grid;
+  @include mq.mq($until: tablet) {
+    gap: 12px;
+  }
+  @include mq.mq($from: tablet) {
+    gap: 24px;
+  }
+}
+
+.item {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 4px #3c4043;
+  display: grid;
+  gap: 8px;
+  grid-template: 1fr auto / 1fr;
+  padding: 12px 12px 8px;
+}
+
+.cardWrapper {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.card,
+.myCard {
+  background: #fff;
+  /* stylelint-disable-next-line csstree/validator */
+  box-shadow: -4px 4px 4px rgba(#3c4043, 0.25);
+  font-size: 2.4rem;
+  padding: 12px;
+}
+
+.card {
+  align-items: center;
+  aspect-ratio: 63 / 88;
+  border: 2px solid #3c4043;
+  border-radius: 12px;
+  display: flex;
+  font-size: 4rem;
+  justify-content: center;
+  position: absolute;
+}
+
+@keyframes SKELETON {
+  0%,
+  100% {
+    /* stylelint-disable-next-line csstree/validator */
+    background: rgba(#3c4043, 0.05);
+  }
+
+  50% {
+    /* stylelint-disable-next-line csstree/validator */
+    background: rgba(#3c4043, 0.1);
+  }
+}
+
+.loading {
+  animation: SKELETON 1.5s infinite linear;
+  border: 0;
+  box-shadow: none;
+}
+
+.nameBlock {
+  align-items: center;
+  display: flex;
+  font-size: 2rem;
+  gap: 8px;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.myBlock {
+  background: #fff;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 0 4px #3c4043;
+  padding: 12px 24px 0;
+}
+
+.cardsWrapper {
+  height: 100%;
+  position: relative;
+}
+
+.myCard {
+  border-left: 2px solid #3c4043;
+  border-radius: 12px 12px 0 0;
+  border-right: 2px solid #3c4043;
+  border-top: 2px solid #3c4043;
+  bottom: -24px;
+  cursor: pointer;
+  height: calc(100% + 24px);
+  left: 0;
+  position: absolute;
+  transform-origin: bottom;
+  transition: 120ms;
+}
+
+.selected,
+.myCard:hover {
+  margin-bottom: 24px;
+}
+
+.selected {
+  background: #61d345;
+  color: #fff;
+}

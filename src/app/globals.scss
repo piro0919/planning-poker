@@ -1,0 +1,35 @@
+html {
+  @include mq.mq($until: tablet) {
+    font-size: 56.25%;
+  }
+  @include mq.mq($from: tablet) {
+    font-size: 62.5%;
+  }
+}
+
+body {
+  background: #f9fbfc;
+  color: #3c4043;
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  min-width: 48px;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+.swal2-popup {
+  scale: 1.5;
+}

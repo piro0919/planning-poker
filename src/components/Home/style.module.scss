@@ -1,0 +1,54 @@
+.wrapper {
+  align-items: center;
+  display: flex;
+  height: 100dvh;
+  justify-content: center;
+}
+
+.inner {
+  background: #fff;
+  border: 2px solid #3c4043;
+  border-radius: 24px;
+  /* stylelint-disable-next-line csstree/validator */
+  box-shadow: -8px 8px 8px rgba(#3c4043, 0.25);
+  display: grid;
+  gap: 36px;
+  justify-items: center;
+  padding: 60px 84px 84px;
+  text-align: center;
+}
+
+.heading1 {
+  font-size: 9.6rem;
+}
+
+.buttonsWrapper {
+  align-items: center;
+  display: grid;
+  gap: 24px;
+  grid-template: auto / 240px auto 360px;
+}
+
+.button {
+  background: #1a73e8;
+  border-radius: 4px;
+  color: #fff;
+  height: 48px;
+  padding: 0 12px;
+  // transition: 120ms;
+}
+
+.existingBlock {
+  display: grid;
+  gap: 12px;
+  grid-template: auto / 1fr 96px;
+}
+
+.input {
+  background: #fff;
+  border: 1px solid #3c4043;
+  border-radius: 4px;
+  height: 48px;
+  padding: 0 12px;
+  width: 100%;
+}
