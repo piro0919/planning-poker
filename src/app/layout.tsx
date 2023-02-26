@@ -1,7 +1,6 @@
 // eslint-disable-next-line filenames/match-exported
 "use client";
-// eslint-disable-next-line camelcase
-import { M_PLUS_Rounded_1c } from "@next/font/google";
+import { M_PLUS_Rounded_1c } from "next/font/google";
 import axios from "axios";
 import { connectFirestoreEmulator } from "firebase/firestore";
 import { ReactNode, useEffect } from "react";

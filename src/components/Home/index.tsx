@@ -1,5 +1,5 @@
 "use client";
-import { Courgette } from "@next/font/google";
+import { Courgette } from "next/font/google";
 import { MouseEventHandler } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styles from "./style.module.scss";

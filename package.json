@@ -2,7 +2,6 @@
   "dependencies": {
     "@commitlint/cli": "17.4.4",
     "@commitlint/config-conventional": "17.4.4",
-    "@next/font": "13.2.1",
     "@react-hook/previous": "1.0.1",
     "@types/node": "18.14.1",
     "@types/react": "18.0.28",
