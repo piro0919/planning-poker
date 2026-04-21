@@ -2,7 +2,7 @@
 
 > Online planning poker for Scrum team story point estimation.
 
-[🔗 Live Demo](https://planning-poker.kk-web.link)
+[🔗 Live Demo](https://planning-poker.kkweb.io)
 
 ## ✨ Features
 
