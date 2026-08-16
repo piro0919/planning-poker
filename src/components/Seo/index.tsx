@@ -16,7 +16,7 @@ export default function Seo({
 
   return (
     <NextSeo
-      canonical={`https://planning-poker.kk-web.link${pathname || ""}`}
+      canonical={`https://planning-poker.kkweb.io${pathname || ""}`}
       defaultTitle="プランニングポーカー"
       description="オンライン版プランニングポーカーです。"
       nofollow={nofollow}
@@ -28,11 +28,11 @@ export default function Seo({
             alt: "プランニングポーカー",
             height: 256,
             type: "image/png",
-            url: "https://planning-poker.kk-web.link/pp.png",
+            url: "https://planning-poker.kkweb.io/pp.png",
             width: 256,
           },
         ],
-        url: "https://planning-poker.kk-web.link/",
+        url: "https://planning-poker.kkweb.io/",
       }}
       title={title}
       titleTemplate="%s - プランニングポーカー"
