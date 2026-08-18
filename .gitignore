@@ -41,3 +41,6 @@ next-env.d.ts
 # pwa
 sw.js
 workbox**.js
+
+# Lighthouse CI reports
+.lighthouseci

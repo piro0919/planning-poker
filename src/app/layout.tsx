@@ -2,6 +2,7 @@
 "use client";
 import "@szhsin/react-menu/dist/index.css";
 import "@szhsin/react-menu/dist/transitions/slide.css";
+import { Analytics } from "@vercel/analytics/next";
 import { connectFirestoreEmulator } from "firebase/firestore";
 // eslint-disable-next-line camelcase
 import { M_PLUS_Rounded_1c } from "next/font/google";
@@ -47,6 +48,7 @@ export default function RootLayout({
             },
           }}
         />
+        <Analytics />
       </body>
     </html>
   );

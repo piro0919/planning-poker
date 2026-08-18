@@ -10,6 +10,7 @@
     "@types/react-dom": "18.2.18",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
+    "@vercel/analytics": "2.0.1",
     "axios": "1.6.4",
     "copy-to-clipboard": "3.3.3",
     "dayjs": "1.11.10",
@@ -79,7 +80,11 @@
     "start": "next start",
     "start:emulators": "firebase emulators:start",
     "stylelint-check": "stylelint-config-prettier-scss-check",
-    "type-check": "tsc --noemit"
+    "type-check": "tsc --noemit",
+    "lighthouse": "pnpm build && lhci autorun"
   },
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "devDependencies": {
+    "@lhci/cli": "0.15.1"
+  }
 }
