@@ -26,10 +26,10 @@ export default function Seo({
         images: [
           {
             alt: "プランニングポーカー",
-            height: 256,
+            height: 630,
             type: "image/png",
-            url: "https://planning-poker.kkweb.io/pp.png",
-            width: 256,
+            url: "https://planning-poker.kkweb.io/ogp.png",
+            width: 1200,
           },
         ],
         url: "https://planning-poker.kkweb.io/",
@@ -37,7 +37,7 @@ export default function Seo({
       title={title}
       titleTemplate="%s - プランニングポーカー"
       twitter={{
-        cardType: "summary",
+        cardType: "summary_large_image",
       }}
       useAppDir={true}
     />
