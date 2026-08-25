@@ -1,7 +1,7 @@
-import styles from "./style.module.scss";
 import { Courgette } from "next/font/google";
-import { SubmitHandler, useForm } from "react-hook-form";
 import { MouseEventHandler } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import styles from "./style.module.scss";
 
 const courgette = Courgette({
   subsets: ["latin"],
