@@ -55,7 +55,7 @@ export default function Board({
 
     return maxRepeatCount - 1;
   }, [users.length, windowHeight, windowWidth]);
-  const [ref, { height, width }] = useElementSize();
+  const [ref, { height = 0, width = 0 }] = useElementSize();
   const cardStyle = useMemo<CSSProperties>(
     () =>
       height / 88 > width / 63
