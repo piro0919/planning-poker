@@ -1,5 +1,6 @@
 import { Menu, MenuButton, MenuItem, MenuItemProps } from "@szhsin/react-menu";
 import dayjs from "dayjs";
+import { useTranslations } from "next-intl";
 import { MouseEventHandler, useMemo } from "react";
 import { FaCrown } from "react-icons/fa";
 import Spacer from "react-spacer";
@@ -30,6 +31,8 @@ export default function Control({
   userId,
   users,
 }: ControlProps): JSX.Element {
+  const t = useTranslations("Control");
+  const tUi = useTranslations("Ui");
   const adminButton = useMemo(() => {
     if (!isAdmin) {
       return null;
@@ -44,14 +47,14 @@ export default function Control({
             disabled={users.length <= 1}
             onClick={onStart}
           >
-            開始する
+            {t("start")}
           </button>
         );
       }
       case "start": {
         return (
           <button className={styles.button} onClick={onStop}>
-            締め切る
+            {t("reveal")}
           </button>
         );
       }
@@ -59,27 +62,27 @@ export default function Control({
         return null;
       }
     }
-  }, [isAdmin, onStart, onStop, status, users.length]);
+  }, [isAdmin, onStart, onStop, status, t, users.length]);
   const statusLabel = useMemo(() => {
     switch (status) {
       case "reserve": {
         return (
           <div className={styles.reserveLabel}>
-            <span>待機中</span>
+            <span>{t("statusWaiting")}</span>
           </div>
         );
       }
       case "start": {
         return (
           <div className={styles.startLabel}>
-            <span>投票中</span>
+            <span>{t("statusVoting")}</span>
           </div>
         );
       }
       case "wait": {
         return (
           <div className={styles.waitLabel}>
-            <span>公開中</span>
+            <span>{t("statusRevealed")}</span>
           </div>
         );
       }
@@ -87,7 +90,7 @@ export default function Control({
         return null;
       }
     }
-  }, [status]);
+  }, [status, t]);
   const menuItems = useMemo(
     () =>
       users
@@ -96,13 +99,11 @@ export default function Control({
           dayjs(createdDateA).isBefore(createdDateB) ? -1 : 1
         )
         .map(({ id, name, onClick }) => (
-          <MenuItem
-            key={id}
-            onClick={onClick}
-            value={id}
-          >{`${name}さん`}</MenuItem>
+          <MenuItem key={id} onClick={onClick} value={id}>
+            {tUi("userName", { name })}
+          </MenuItem>
         )),
-    [userId, users]
+    [tUi, userId, users]
   );
   const disabled = useMemo(
     () => isAdmin && users.some(({ id }) => userId !== id),
@@ -129,7 +130,7 @@ export default function Control({
       <Spacer grow={1} />
       {statusLabel}
       <button className={styles.button} disabled={disabled} onClick={onLeave}>
-        退出する
+        {t("leave")}
       </button>
     </div>
   );

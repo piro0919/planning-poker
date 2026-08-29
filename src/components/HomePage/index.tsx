@@ -1,16 +1,17 @@
 "use client";
 import copy from "copy-to-clipboard";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import toast from "react-hot-toast";
 import Home, { HomeProps } from "@/components/Home";
-import Seo from "@/components/Seo";
+import { useRouter } from "@/i18n/navigation";
 
 /** 部屋を作った本人だけが、この印を持って最初の接続に来る。 */
 const CREATE_KEY = "create-room";
 
-export default function Page(): JSX.Element {
+export default function HomePage(): JSX.Element {
   const router = useRouter();
+  const t = useTranslations("Home");
   const handleCreate = useCallback<HomeProps["onCreate"]>(() => {
     const roomId = window.crypto.randomUUID();
 
@@ -19,18 +20,13 @@ export default function Page(): JSX.Element {
 
     copy(`${window.location.origin}/rooms/${roomId}`);
 
-    toast.success("部屋のURLをコピーしました");
+    toast.success(t("urlCopied"));
 
     router.push(`/rooms/${roomId}`);
-  }, [router]);
+  }, [router, t]);
   const handleSubmit: HomeProps["onSubmit"] = ({ roomId }) => {
     router.push(`/rooms/${roomId.split("/").at(-1) || ""}`);
   };
 
-  return (
-    <>
-      <Seo type="website" />
-      <Home onCreate={handleCreate} onSubmit={handleSubmit} />
-    </>
-  );
+  return <Home onCreate={handleCreate} onSubmit={handleSubmit} />;
 }

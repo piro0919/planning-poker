@@ -1,6 +1,8 @@
+import { useTranslations } from "next-intl";
 import { MouseEventHandler } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styles from "./style.module.scss";
+import LocaleSwitch from "@/components/LocaleSwitch";
 import { courgette } from "@/libs/fonts";
 
 type FieldValues = {
@@ -13,6 +15,7 @@ export type HomeProps = {
 };
 
 export default function Home({ onCreate, onSubmit }: HomeProps): JSX.Element {
+  const t = useTranslations("Home");
   const { handleSubmit, register } = useForm<FieldValues>({
     defaultValues: {
       roomId: "",
@@ -21,13 +24,14 @@ export default function Home({ onCreate, onSubmit }: HomeProps): JSX.Element {
 
   return (
     <div className={styles.wrapper}>
+      <LocaleSwitch />
       <main className={styles.main}>
         <h1 className={`${courgette.className} ${styles.heading1}`}>
           Planning Poker
         </h1>
         <div className={styles.buttonsWrapper}>
           <button className={styles.button} onClick={onCreate}>
-            新しい部屋を作成
+            {t("create")}
           </button>
           <div className={styles.separator}>|</div>
           <form
@@ -38,10 +42,10 @@ export default function Home({ onCreate, onSubmit }: HomeProps): JSX.Element {
               <input
                 {...register("roomId", { required: true })}
                 className={styles.input}
-                placeholder="部屋IDを入力"
+                placeholder={t("roomIdPlaceholder")}
               />
               <button className={styles.button} type="submit">
-                参加
+                {t("join")}
               </button>
             </div>
           </form>

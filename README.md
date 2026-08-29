@@ -10,11 +10,16 @@
 - 👥 Real-time team sessions
 - 📊 Vote reveal and results summary
 - 📱 Responsive design
+- 🌐 English and Japanese (English at `/`, Japanese at `/ja`)
 
 ## 🛠 Tech Stack
 
 - Next.js + React + TypeScript (hosted on Vercel)
 - Cloudflare Workers + Durable Objects for the realtime room state
+- next-intl for the UI copy and the per-language metadata
+
+The wording lives in `messages/en.json` and `messages/ja.json`; `src/i18n/routing.ts`
+decides which languages exist and which one is the default.
 
 Each room is one Durable Object. Clients hold a single WebSocket to it, and the
 room deletes itself two days after it was last touched.

@@ -1,0 +1,37 @@
+{
+  "Board": {
+    "you": "You"
+  },
+  "Control": {
+    "leave": "Leave",
+    "reveal": "Reveal",
+    "start": "Start",
+    "statusRevealed": "Revealed",
+    "statusVoting": "Voting",
+    "statusWaiting": "Waiting"
+  },
+  "Home": {
+    "create": "Create a room",
+    "join": "Join",
+    "roomIdPlaceholder": "Enter a room ID",
+    "urlCopied": "Copied the room URL"
+  },
+  "Room": {
+    "connected": "Back online",
+    "disconnected": "Connection lost. Reconnecting…",
+    "joined": "{name} joined",
+    "left": "{name} left",
+    "nameRequired": "Please enter your name",
+    "namePrompt": "Enter your name",
+    "revealed": "Cards revealed",
+    "started": "Voting started"
+  },
+  "Site": {
+    "description": "Online planning poker for agile estimation. No sign-up — create a room and share the URL.",
+    "title": "Planning Poker"
+  },
+  "Ui": {
+    "switchLocale": "日本語に切り替える",
+    "userName": "{name}"
+  }
+}

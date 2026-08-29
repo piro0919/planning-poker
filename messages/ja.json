@@ -1,0 +1,37 @@
+{
+  "Board": {
+    "you": "あなた"
+  },
+  "Control": {
+    "leave": "退出する",
+    "reveal": "締め切る",
+    "start": "開始する",
+    "statusRevealed": "公開中",
+    "statusVoting": "投票中",
+    "statusWaiting": "待機中"
+  },
+  "Home": {
+    "create": "新しい部屋を作成",
+    "join": "参加",
+    "roomIdPlaceholder": "部屋IDを入力",
+    "urlCopied": "部屋のURLをコピーしました"
+  },
+  "Room": {
+    "connected": "接続が戻りました",
+    "disconnected": "接続が切れました。繋ぎ直しています…",
+    "joined": "{name}さんが入室しました",
+    "left": "{name}さんが退室しました",
+    "nameRequired": "お名前が入力されていません",
+    "namePrompt": "お名前を入力してください",
+    "revealed": "公開しました",
+    "started": "開始しました"
+  },
+  "Site": {
+    "description": "オンライン版プランニングポーカーです。登録は要りません。部屋を作って URL を配るだけ。",
+    "title": "プランニングポーカー"
+  },
+  "Ui": {
+    "switchLocale": "Switch to English",
+    "userName": "{name}さん"
+  }
+}

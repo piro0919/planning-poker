@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { useTranslations } from "next-intl";
 import { CSSProperties, useMemo } from "react";
 import { FaCheckCircle, FaCrown } from "react-icons/fa";
 import { TailSpin } from "react-loader-spinner";
@@ -26,6 +27,8 @@ export default function Board({
   userId,
   users: propUsers,
 }: BoardProps): JSX.Element {
+  const t = useTranslations("Board");
+  const tUi = useTranslations("Ui");
   const users = useMemo(
     () =>
       propUsers
@@ -88,11 +91,11 @@ export default function Board({
           </div>
           <div className={styles.nameBlock}>
             {adminUserId === id ? <FaCrown color="#ead665" /> : null}
-            {userId === id ? "あなた" : `${name}さん`}
+            {userId === id ? t("you") : tUi("userName", { name })}
           </div>
         </li>
       )),
-    [adminUserId, cardStyle, ref, status, userId, users]
+    [adminUserId, cardStyle, ref, status, t, tUi, userId, users]
   );
 
   return (

@@ -1,25 +1,26 @@
 "use client";
 import usePrevious from "@react-hook/previous";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import Room, { RoomProps } from "@/components/Room";
-import Seo from "@/components/Seo";
 import useFibonacci from "@/hooks/useFibonacci";
 import useRoomSocket from "@/hooks/useRoomSocket";
+import { useRouter } from "@/i18n/navigation";
 
 const MySwal = withReactContent(Swal);
 /** 部屋を作った本人だけが、この印を持って最初の接続に来る。 */
 const CREATE_KEY = "create-room";
 
-export type PageProps = {
-  params: { roomId: string };
+export type RoomPageProps = {
+  roomId: string;
 };
 
-export default function Page({ params: { roomId } }: PageProps): JSX.Element {
+export default function RoomPage({ roomId }: RoomPageProps): JSX.Element {
   const router = useRouter();
+  const t = useTranslations("Room");
   const { fibonacci } = useFibonacci();
   const [create] = useState(() => {
     if (typeof window === "undefined") {
@@ -101,13 +102,13 @@ export default function Page({ params: { roomId } }: PageProps): JSX.Element {
     }
 
     if (connected) {
-      toast.success("接続が戻りました");
+      toast.success(t("connected"));
 
       return;
     }
 
-    toast.error("接続が切れました。繋ぎ直しています…");
-  }, [connected, prevConnected]);
+    toast.error(t("disconnected"));
+  }, [connected, prevConnected, t]);
 
   useEffect(() => {
     if (phase !== "naming") {
@@ -128,9 +129,8 @@ export default function Page({ params: { roomId } }: PageProps): JSX.Element {
         allowOutsideClick: false,
         icon: "question",
         input: "text",
-        inputValidator: (value) =>
-          value ? null : "お名前が入力されていません",
-        titleText: "お名前を入力してください",
+        inputValidator: (value) => (value ? null : t("nameRequired")),
+        titleText: t("namePrompt"),
       });
 
       if (typeof value !== "string") {
@@ -142,7 +142,7 @@ export default function Page({ params: { roomId } }: PageProps): JSX.Element {
 
     // eslint-disable-next-line no-void
     void callback();
-  }, [join, phase]);
+  }, [join, phase, t]);
 
   useEffect(
     () => () => {
@@ -165,9 +165,9 @@ export default function Page({ params: { roomId } }: PageProps): JSX.Element {
       .filter(({ id }) => userId !== id)
       .filter(({ id }) => !usersB.some(({ id: prevId }) => id === prevId))
       .forEach(({ name }) => {
-        toast.success(`${name}さんが${isEnter ? "入室" : "退室"}しました`);
+        toast.success(isEnter ? t("joined", { name }) : t("left", { name }));
       });
-  }, [prevUsers, userId, users]);
+  }, [prevUsers, t, userId, users]);
 
   useEffect(() => {
     if (!userId) {
@@ -175,30 +175,27 @@ export default function Page({ params: { roomId } }: PageProps): JSX.Element {
     }
 
     if (room.status === "start") {
-      toast.success("開始しました");
+      toast.success(t("started"));
 
       return;
     }
 
     if (room.status === "wait") {
-      toast.success("公開しました");
+      toast.success(t("revealed"));
     }
-  }, [room.status, userId]);
+  }, [room.status, t, userId]);
 
   return (
-    <>
-      <Seo nofollow={true} noindex={true} />
-      <Room
-        adminUserId={room.adminId}
-        cards={cards}
-        onLeave={handleLeave}
-        onStart={handleStart}
-        onStop={handleStop}
-        selectedValue={selectedValue}
-        status={room.status}
-        userId={userId}
-        users={users}
-      />
-    </>
+    <Room
+      adminUserId={room.adminId}
+      cards={cards}
+      onLeave={handleLeave}
+      onStart={handleStart}
+      onStop={handleStop}
+      selectedValue={selectedValue}
+      status={room.status}
+      userId={userId}
+      users={users}
+    />
   );
 }

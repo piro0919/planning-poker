@@ -1,0 +1,18 @@
+.button {
+  background: #fff;
+  border: 2px solid #3c4043;
+  border-radius: 4px;
+  /* stylelint-disable-next-line csstree/validator */
+  box-shadow: -4px 4px 4px rgba(#3c4043, 0.25);
+  height: 40px;
+  min-width: 56px;
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  transition: 120ms;
+}
+
+.button:hover {
+  background: #1a73e8;
+  color: #fff;
+}
