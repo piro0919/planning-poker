@@ -477,13 +477,29 @@ export class Room extends DurableObject<Env> {
 }
 
 const ROOM_PATH = /^\/rooms\/([^/]+)\/ws$/;
+const REGEXP_CHARS = /[.+?^${}()|[\]\\]/g;
+
+// ALLOWED_ORIGINS の各項目は * を含められる。Vercel の Preview は
+// デプロイごとに URL が変わるため、そこだけを * で受ける。
+function matchesOrigin(origin: string, pattern: string): boolean {
+  if (!pattern.includes("*")) {
+    return pattern === origin;
+  }
+
+  const source = pattern
+    .split("*")
+    .map((part) => part.replace(REGEXP_CHARS, "\\$&"))
+    .join("[^/]*");
+
+  return new RegExp(`^${source}$`).test(origin);
+}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const origin = request.headers.get("Origin");
     const allowed = env.ALLOWED_ORIGINS.split(",").map((value) => value.trim());
 
-    if (origin && !allowed.includes(origin)) {
+    if (origin && !allowed.some((pattern) => matchesOrigin(origin, pattern))) {
       return new Response("forbidden origin", { status: 403 });
     }
 

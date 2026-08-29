@@ -21,6 +21,6 @@
     }
   },
   "vars": {
-    "ALLOWED_ORIGINS": "https://planning-poker.kkweb.io,http://localhost:3000"
+    "ALLOWED_ORIGINS": "https://planning-poker.kkweb.io,http://localhost:3000,https://planning-poker-*-kkweb.vercel.app"
   }
 }
