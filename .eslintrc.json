@@ -10,6 +10,14 @@
     "prettier"
   ],
   "ignorePatterns": ["*.d.ts", "*.js"],
+  "overrides": [
+    {
+      "files": ["worker/**/*.ts"],
+      "parserOptions": {
+        "project": ["./worker/tsconfig.json"]
+      }
+    }
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": ["./tsconfig.json"],

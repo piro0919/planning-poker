@@ -1,44 +1,28 @@
 "use client";
-import axios, { AxiosResponse } from "axios";
 import copy from "copy-to-clipboard";
-import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import toast from "react-hot-toast";
-import { useSessionStorage } from "usehooks-ts";
-import { PostRoomsBody, PostRoomsData } from "./api/rooms/route";
 import Home, { HomeProps } from "@/components/Home";
 import Seo from "@/components/Seo";
 
+/** 部屋を作った本人だけが、この印を持って最初の接続に来る。 */
+const CREATE_KEY = "create-room";
+
 export default function Page(): JSX.Element {
   const router = useRouter();
-  const [_, setIsAdmin] = useSessionStorage("is-admin", "");
-  const handleCreate = useCallback<HomeProps["onCreate"]>(async () => {
-    setIsAdmin("true");
+  const handleCreate = useCallback<HomeProps["onCreate"]>(() => {
+    const roomId = window.crypto.randomUUID();
 
-    const myPromise = axios.post<
-      PostRoomsData,
-      AxiosResponse<PostRoomsData>,
-      PostRoomsBody
-    >("/api/rooms", {
-      adminId: "",
-      createdDate: dayjs().format("YYYY-MM-DD"),
-      status: "reserve",
-    });
-    const {
-      data: { id },
-    } = await toast.promise(myPromise, {
-      error: "新しい部屋を作成に失敗しました…",
-      loading: "新しい部屋を作成中です…",
-      success: "新しい部屋を作成しました",
-    });
+    // 部屋の実体は、この印を持った接続が届いたときに Worker 側で作られる。
+    window.sessionStorage.setItem(CREATE_KEY, roomId);
 
-    copy(`${window.location.origin}/rooms/${id}`);
+    copy(`${window.location.origin}/rooms/${roomId}`);
 
     toast.success("部屋のURLをコピーしました");
 
-    router.push(`/rooms/${id}`);
-  }, [router, setIsAdmin]);
+    router.push(`/rooms/${roomId}`);
+  }, [router]);
   const handleSubmit: HomeProps["onSubmit"] = ({ roomId }) => {
     router.push(`/rooms/${roomId.split("/").at(-1) || ""}`);
   };

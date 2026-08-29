@@ -44,3 +44,6 @@ workbox**.js
 
 # Lighthouse CI reports
 .lighthouseci
+
+# cloudflare
+.wrangler

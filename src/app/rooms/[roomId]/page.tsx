@@ -1,212 +1,127 @@
 "use client";
 import usePrevious from "@react-hook/previous";
-import axios, { AxiosResponse } from "axios";
-import dayjs from "dayjs";
-import { CollectionReference, DocumentReference } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import {
-  useEffectOnce,
-  useEventListener,
-  useSessionStorage,
-} from "usehooks-ts";
-import {
-  PatchRoomsRoomIdAdminIdBody,
-  PatchRoomsRoomIdAdminIdData,
-} from "@/app/api/rooms/[roomId]/adminId/route";
-import {
-  PatchRoomsRoomIdStatusBody,
-  PatchRoomsRoomIdStatusData,
-} from "@/app/api/rooms/[roomId]/status/route";
-import {
-  DeleteRoomsRoomIdUsersUserIdBody,
-  DeleteRoomsRoomIdUsersUserIdData,
-} from "@/app/api/rooms/[roomId]/users/[userId]/route";
-import {
-  PatchRoomsRoomIdUsersUserIdValueBody,
-  PatchRoomsRoomIdUsersUserIdValueData,
-} from "@/app/api/rooms/[roomId]/users/[userId]/value/route";
-import {
-  PostRoomsRoomIdUsersBody,
-  PostRoomsRoomIdUsersData,
-} from "@/app/api/rooms/[roomId]/users/route";
 import Room, { RoomProps } from "@/components/Room";
 import Seo from "@/components/Seo";
 import useFibonacci from "@/hooks/useFibonacci";
-// import useOnSnapshot from "@/hooks/useOnSnapshot";
-import useOnSnapshot from "@/hooks/useOnSnapshot";
-import db from "@/libs/db";
+import useRoomSocket from "@/hooks/useRoomSocket";
 
 const MySwal = withReactContent(Swal);
+/** 部屋を作った本人だけが、この印を持って最初の接続に来る。 */
+const CREATE_KEY = "create-room";
 
 export type PageProps = {
   params: { roomId: string };
 };
 
 export default function Page({ params: { roomId } }: PageProps): JSX.Element {
-  const { fibonacci } = useFibonacci();
-  const [userId, setUserId] = useState("");
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useSessionStorage("is-admin", "");
-  const handleStart = useCallback<RoomProps["onStart"]>(async () => {
-    const myPromise = axios.patch<
-      PatchRoomsRoomIdStatusData,
-      AxiosResponse<PatchRoomsRoomIdStatusData>,
-      PatchRoomsRoomIdStatusBody
-    >(`/api/rooms/${roomId}/status`, {
-      status: "start",
-    });
-
-    await toast.promise(myPromise, {
-      error: "開始に失敗しました…",
-      loading: "開始中です…",
-      success: "開始しました",
-    });
-  }, [roomId]);
-  const handleStop = useCallback<RoomProps["onStop"]>(async () => {
-    await axios.patch<
-      PatchRoomsRoomIdStatusData,
-      AxiosResponse<PatchRoomsRoomIdStatusData>,
-      PatchRoomsRoomIdStatusBody
-    >(`/api/rooms/${roomId}/status`, {
-      status: "wait",
-    });
-  }, [roomId]);
-  const { data: usersData } = useOnSnapshot<
-    CollectionReference,
-    Firestore.User
-  >({
-    firestore: db,
-    paths: ["rooms", roomId, "users"],
-    type: "query",
-  });
-  const users = useMemo<RoomProps["users"]>(() => {
-    let users: RoomProps["users"] = [];
-
-    usersData?.forEach((result) => {
-      const { createdDate, name, value } = result.data();
-
-      users = [
-        ...users,
-        {
-          createdDate,
-          name,
-          value,
-          id: result.id,
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick: async ({ value }): Promise<void> => {
-            if (typeof value !== "string") {
-              return;
-            }
-
-            await axios.patch<
-              PatchRoomsRoomIdAdminIdData,
-              AxiosResponse<PatchRoomsRoomIdAdminIdData>,
-              PatchRoomsRoomIdAdminIdBody
-            >(`/api/rooms/${roomId}/adminId`, {
-              adminId: value,
-            });
-          },
-        },
-      ];
-    });
-
-    return users;
-  }, [roomId, usersData]);
-  const prevUsers = usePrevious(users);
-  const { data: roomData, loading: roomLoading } = useOnSnapshot<
-    DocumentReference,
-    Firestore.Room
-  >({
-    firestore: db,
-    paths: ["rooms", roomId],
-    type: "reference",
-  });
-  const adminUserId = useMemo<RoomProps["adminUserId"]>(() => {
-    if (!roomData) {
-      return "";
+  const { fibonacci } = useFibonacci();
+  const [create] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
     }
 
-    const room = roomData.data();
+    const created = window.sessionStorage.getItem(CREATE_KEY) === roomId;
 
-    return room?.adminId || "";
-  }, [roomData]);
-  const handleLeave = useCallback<RoomProps["onLeave"]>(async () => {
-    setIsAdmin("");
+    window.sessionStorage.removeItem(CREATE_KEY);
 
-    const myPromise = axios.delete<
-      DeleteRoomsRoomIdUsersUserIdData,
-      AxiosResponse<DeleteRoomsRoomIdUsersUserIdData>,
-      DeleteRoomsRoomIdUsersUserIdBody
-    >(`/api/rooms/${roomId}/users/${userId}`);
-
-    await toast.promise(myPromise, {
-      error: "退室に失敗しました…",
-      loading: "退室中です…",
-      success: "退室しました",
-    });
-
-    router.push("/");
-  }, [roomId, router, setIsAdmin, userId]);
+    return created;
+  });
+  const {
+    connected,
+    handOver,
+    join,
+    leave,
+    phase,
+    reveal,
+    room,
+    start,
+    userId,
+    vote,
+  } = useRoomSocket({ create, roomId });
+  const users = useMemo<RoomProps["users"]>(
+    () =>
+      room.users.map(({ createdDate, hasVoted, id, name, value }) => ({
+        createdDate,
+        hasVoted,
+        id,
+        name,
+        value,
+        onClick: (): void => {
+          handOver(id);
+        },
+      })),
+    [handOver, room.users]
+  );
+  const prevUsers = usePrevious(users);
   const cards = useMemo<RoomProps["cards"]>(
     () =>
       fibonacci.map((value) => ({
         value,
-        onSelect: async (): Promise<void> => {
-          const myPromise = axios.patch<
-            PatchRoomsRoomIdUsersUserIdValueData,
-            AxiosResponse<PatchRoomsRoomIdUsersUserIdValueData>,
-            PatchRoomsRoomIdUsersUserIdValueBody
-          >(`/api/rooms/${roomId}/users/${userId}/value`, {
-            value,
-          });
-
-          await toast.promise(myPromise, {
-            error: "投票に失敗しました…",
-            loading: "投票中です…",
-            success: "投票しました",
-          });
-
-          if (
-            users.filter(({ id }) => userId !== id).some(({ value }) => !value)
-          ) {
-            return;
-          }
-
-          await axios.patch(`/api/rooms/${roomId}/status`, {
-            status: "wait",
-          });
+        onSelect: (): void => {
+          vote(value);
         },
       })),
-    [fibonacci, roomId, userId, users]
+    [fibonacci, vote]
   );
-  const selectedValue = useMemo<RoomProps["selectedValue"]>(() => {
-    const user = users.find(({ id }) => userId === id);
+  const selectedValue = useMemo<RoomProps["selectedValue"]>(
+    () => users.find(({ id }) => userId === id)?.value || "",
+    [userId, users]
+  );
+  const handleStart = useCallback<RoomProps["onStart"]>(() => {
+    start();
+  }, [start]);
+  const handleStop = useCallback<RoomProps["onStop"]>(() => {
+    reveal();
+  }, [reveal]);
+  const handleLeave = useCallback<RoomProps["onLeave"]>(() => {
+    leave();
 
-    return user?.value || "";
-  }, [userId, users]);
-  const status = useMemo<RoomProps["status"]>(() => {
-    if (!roomData) {
-      return "reserve";
-    }
-
-    const room = roomData.data();
-
-    return room?.status || "reserve";
-  }, [roomData]);
+    router.push("/");
+  }, [leave, router]);
+  const asked = useRef(false);
+  const prevConnected = usePrevious(connected);
 
   useEffect(() => {
-    if (roomLoading || roomData?.exists()) {
+    if (phase !== "notFound") {
       return;
     }
 
     router.push("/404");
-  }, [roomData, roomLoading, router]);
+  }, [phase, router]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
+    if (prevConnected === undefined || prevConnected === connected) {
+      return;
+    }
+
+    if (connected) {
+      toast.success("接続が戻りました");
+
+      return;
+    }
+
+    toast.error("接続が切れました。繋ぎ直しています…");
+  }, [connected, prevConnected]);
+
+  useEffect(() => {
+    if (phase !== "naming") {
+      asked.current = false;
+
+      return;
+    }
+
+    if (asked.current) {
+      return;
+    }
+
+    asked.current = true;
+
     const callback = async (): Promise<void> => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const { value } = await MySwal.fire({
@@ -222,45 +137,19 @@ export default function Page({ params: { roomId } }: PageProps): JSX.Element {
         return;
       }
 
-      const myPromise = axios.post<
-        PostRoomsRoomIdUsersData,
-        AxiosResponse<PostRoomsRoomIdUsersData>,
-        PostRoomsRoomIdUsersBody
-      >(`/api/rooms/${roomId}/users`, {
-        createdDate: dayjs().format("YYYY-MM-DD"),
-        name: value,
-        value: "",
-      });
-      const {
-        data: { id },
-      } = await toast.promise(myPromise, {
-        error: "入室に失敗しました…",
-        loading: "入室中です…",
-        success: "入室しました",
-      });
-
-      setUserId(id);
-
-      if (!isAdmin) {
-        return;
-      }
-
-      await axios.patch<
-        PatchRoomsRoomIdAdminIdData,
-        AxiosResponse<PatchRoomsRoomIdAdminIdData>,
-        PatchRoomsRoomIdAdminIdBody
-      >(`/api/rooms/${roomId}/adminId`, {
-        adminId: id,
-      });
+      join(value);
     };
 
     // eslint-disable-next-line no-void
     void callback();
+  }, [join, phase]);
 
-    return () => {
+  useEffect(
+    () => () => {
       MySwal.close();
-    };
-  });
+    },
+    []
+  );
 
   useEffect(() => {
     if (!userId || !prevUsers) {
@@ -281,65 +170,32 @@ export default function Page({ params: { roomId } }: PageProps): JSX.Element {
   }, [prevUsers, userId, users]);
 
   useEffect(() => {
-    const callback = async (): Promise<void> => {
-      if (status !== "start") {
-        return;
-      }
-
-      // eslint-disable-next-line no-void
-      await axios.patch<
-        PatchRoomsRoomIdUsersUserIdValueData,
-        AxiosResponse<PatchRoomsRoomIdUsersUserIdValueData>,
-        PatchRoomsRoomIdUsersUserIdValueBody
-      >(`/api/rooms/${roomId}/users/${userId}/value`, {
-        value: "",
-      });
-    };
-
-    // eslint-disable-next-line no-void
-    void callback();
-  }, [roomId, status, userId]);
-
-  useEffect(() => {
     if (!userId) {
       return;
     }
 
-    if (!isAdmin && status === "start") {
+    if (room.status === "start") {
       toast.success("開始しました");
 
       return;
     }
 
-    if (status === "wait") {
+    if (room.status === "wait") {
       toast.success("公開しました");
     }
-  }, [isAdmin, status, userId]);
-
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  useEventListener("beforeunload", async (e) => {
-    e.preventDefault();
-
-    setIsAdmin("");
-
-    await axios.delete<
-      DeleteRoomsRoomIdUsersUserIdData,
-      AxiosResponse<DeleteRoomsRoomIdUsersUserIdData>,
-      DeleteRoomsRoomIdUsersUserIdBody
-    >(`/api/rooms/${roomId}/users/${userId}`);
-  });
+  }, [room.status, userId]);
 
   return (
     <>
       <Seo nofollow={true} noindex={true} />
       <Room
-        adminUserId={adminUserId}
+        adminUserId={room.adminId}
         cards={cards}
         onLeave={handleLeave}
         onStart={handleStart}
         onStop={handleStop}
         selectedValue={selectedValue}
-        status={status}
+        status={room.status}
         userId={userId}
         users={users}
       />

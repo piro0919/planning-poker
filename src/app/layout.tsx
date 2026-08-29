@@ -3,23 +3,17 @@
 import "@szhsin/react-menu/dist/index.css";
 import "@szhsin/react-menu/dist/transitions/slide.css";
 import { Analytics } from "@vercel/analytics/next";
-import { connectFirestoreEmulator } from "firebase/firestore";
 // eslint-disable-next-line camelcase
 import { M_PLUS_Rounded_1c } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "ress/dist/ress.min.css";
 import "./globals.scss";
 import "./mq-settings.scss";
-import db from "@/libs/db";
 
 const mPLUSRounded1C = M_PLUS_Rounded_1c({
   subsets: ["latin"],
   weight: "400",
 });
-
-if (process.env.NODE_ENV === "development") {
-  connectFirestoreEmulator(db, "localhost", 8080);
-}
 
 export default function RootLayout({
   children,
