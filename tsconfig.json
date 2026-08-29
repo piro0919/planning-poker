@@ -25,11 +25,5 @@
     "target": "es5"
   },
   "exclude": ["node_modules", "worker"],
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "/Users/kawamurakouhei/Repository/planning-poker2/.next/types/**/*.ts"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
 }
