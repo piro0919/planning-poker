@@ -1,6 +1,6 @@
 {
   "background_color": "#1a73e8",
-  "description": "オンライン版プランニングポーカーです。",
+  "description": "Online planning poker for agile estimation. No sign-up — create a room and share the URL.",
   "display": "fullscreen",
   "icons": [
     {
@@ -19,10 +19,11 @@
       "type": "image/png"
     }
   ],
-  "name": "プランニングポーカー",
+  "lang": "en",
+  "name": "Planning Poker",
   "orientation": "portrait",
   "screenshots": [],
-  "short_name": "プランニングポーカー",
+  "short_name": "Planning Poker",
   "shortcuts": [],
   "start_url": ".",
   "theme_color": "#ffffff"
