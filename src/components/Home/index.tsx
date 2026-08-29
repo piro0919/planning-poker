@@ -1,12 +1,7 @@
-import { Courgette } from "next/font/google";
 import { MouseEventHandler } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styles from "./style.module.scss";
-
-const courgette = Courgette({
-  subsets: ["latin"],
-  weight: "400",
-});
+import { courgette } from "@/libs/fonts";
 
 type FieldValues = {
   roomId: string;

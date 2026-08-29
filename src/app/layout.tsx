@@ -3,17 +3,11 @@
 import "@szhsin/react-menu/dist/index.css";
 import "@szhsin/react-menu/dist/transitions/slide.css";
 import { Analytics } from "@vercel/analytics/next";
-// eslint-disable-next-line camelcase
-import { M_PLUS_Rounded_1c } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "ress/dist/ress.min.css";
 import "./globals.scss";
 import "./mq-settings.scss";
-
-const mPLUSRounded1C = M_PLUS_Rounded_1c({
-  subsets: ["latin"],
-  weight: "400",
-});
+import { mPlusRounded1c } from "@/libs/fonts";
 
 export default function RootLayout({
   children,
@@ -30,7 +24,7 @@ export default function RootLayout({
         <link href="/manifest.json" rel="manifest" />
         <link href="/logo192.png" rel="apple-touch-icon" />
       </head>
-      <body className={mPLUSRounded1C.className}>
+      <body className={mPlusRounded1c.className}>
         <script />
         {children}
         <Toaster
