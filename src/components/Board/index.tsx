@@ -7,6 +7,7 @@ import styles from "./style.module.scss";
 
 type User = {
   createdDate: string;
+  hasVoted: boolean;
   id: string;
   name: string;
   value: string;
@@ -67,7 +68,7 @@ export default function Board({
   );
   const items = useMemo(
     () =>
-      users.map(({ id, name, value }, index) => (
+      users.map(({ hasVoted, id, name, value }, index) => (
         <li className={styles.item} key={id}>
           <div className={styles.cardWrapper} ref={index ? undefined : ref}>
             <div
@@ -76,10 +77,10 @@ export default function Board({
               }`}
               style={cardStyle}
             >
-              {value && status === "start" ? (
+              {hasVoted && status === "start" ? (
                 <FaCheckCircle color="#61d345" size={64} />
               ) : null}
-              {!value && status === "start" ? (
+              {!hasVoted && status === "start" ? (
                 <TailSpin color="#61d345" height={64} width={64} />
               ) : null}
               {status === "wait" ? value : null}

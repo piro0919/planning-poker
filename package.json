@@ -11,7 +11,6 @@
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
     "@vercel/analytics": "2.0.1",
-    "axios": "1.19.0",
     "copy-to-clipboard": "3.3.3",
     "dayjs": "1.11.23",
     "eslint": "8.57.1",
@@ -28,9 +27,6 @@
     "eslint-plugin-sort-keys-shorthand": "2.3.0",
     "eslint-plugin-typescript-sort-keys": "2.3.0",
     "eslint-plugin-unused-imports": "2.0.0",
-    "firebase": "9.23.0",
-    "firebase-admin": "11.11.1",
-    "firebase-tools": "11.30.0",
     "husky": "8.0.3",
     "lint-staged": "13.3.0",
     "next": "13.5.11",
@@ -70,20 +66,25 @@
   "scripts": {
     "build": "next build",
     "build-with-analyze": "ANALYZE=true next build",
-    "dev": "FIRESTORE_EMULATOR_HOST=localhost:8080 next dev",
+    "dev": "next dev",
     "lint": "next lint",
     "lint:es": "next lint",
     "lint:style": "stylelint --fix '**/*.scss'",
     "prepare": "npx husky install",
     "prettier": "prettier --write src",
     "start": "next start",
-    "start:emulators": "firebase emulators:start",
     "stylelint-check": "stylelint-config-prettier-scss-check",
     "type-check": "tsc --noemit",
-    "lighthouse": "pnpm build && lhci autorun"
+    "lighthouse": "pnpm build && lhci autorun",
+    "worker:dev": "wrangler dev --config worker/wrangler.jsonc",
+    "worker:deploy": "wrangler deploy --config worker/wrangler.jsonc",
+    "worker:type-check": "tsc -p worker/tsconfig.json",
+    "lint:worker": "eslint worker"
   },
   "version": "0.1.0",
   "devDependencies": {
-    "@lhci/cli": "0.15.1"
+    "@cloudflare/workers-types": "5.20260829.1",
+    "@lhci/cli": "0.15.1",
+    "wrangler": "4.127.1"
   }
 }
