@@ -51,6 +51,9 @@
     "use-on-snapshot": "0.2.0",
     "usehooks-ts": "3.1.1"
   },
+  "engines": {
+    "node": "24.x"
+  },
   "name": "planning-poker2",
   "private": true,
   "scripts": {
