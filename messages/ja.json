@@ -19,10 +19,22 @@
   "Room": {
     "connected": "接続が戻りました",
     "disconnected": "接続が切れました。繋ぎ直しています…",
+    "errors": {
+      "adminOnly": "管理者だけができる操作です",
+      "alreadyJoined": "すでに入室しています",
+      "invalidMessage": "送った内容を受け付けられませんでした",
+      "nameEmpty": "お名前が入力されていません",
+      "nameTooLong": "お名前が長すぎます",
+      "notJoined": "まだ入室していません",
+      "notStarted": "まだ投票が始まっていません",
+      "unknown": "操作を受け付けられませんでした",
+      "userGone": "その人はもう退室しています"
+    },
     "joined": "{name}さんが入室しました",
     "left": "{name}さんが退室しました",
     "nameRequired": "お名前が入力されていません",
     "namePrompt": "お名前を入力してください",
+    "nameTooLong": "お名前は{max}文字までです",
     "revealed": "公開しました",
     "started": "開始しました"
   },

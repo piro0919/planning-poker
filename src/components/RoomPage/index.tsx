@@ -7,8 +7,9 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import Room, { RoomProps } from "@/components/Room";
 import useFibonacci from "@/hooks/useFibonacci";
-import useRoomSocket from "@/hooks/useRoomSocket";
+import useRoomSocket, { UseRoomSocketParams } from "@/hooks/useRoomSocket";
 import { useRouter } from "@/i18n/navigation";
+import { NAME_MAX_LENGTH, normalizeName } from "@/libs/protocol";
 
 const MySwal = withReactContent(Swal);
 /** 部屋を作った本人だけが、この印を持って最初の接続に来る。 */
@@ -33,6 +34,12 @@ export default function RoomPage({ roomId }: RoomPageProps): JSX.Element {
 
     return created;
   });
+  const handleError = useCallback<NonNullable<UseRoomSocketParams["onError"]>>(
+    (code) => {
+      toast.error(t(`errors.${code}`));
+    },
+    [t]
+  );
   const {
     connected,
     handOver,
@@ -44,7 +51,7 @@ export default function RoomPage({ roomId }: RoomPageProps): JSX.Element {
     start,
     userId,
     vote,
-  } = useRoomSocket({ create, roomId });
+  } = useRoomSocket({ create, roomId, onError: handleError });
   const users = useMemo<RoomProps["users"]>(
     () =>
       room.users.map(({ createdDate, hasVoted, id, name, value }) => ({
@@ -129,7 +136,18 @@ export default function RoomPage({ roomId }: RoomPageProps): JSX.Element {
         allowOutsideClick: false,
         icon: "question",
         input: "text",
-        inputValidator: (value) => (value ? null : t("nameRequired")),
+        inputAttributes: { maxlength: String(NAME_MAX_LENGTH) },
+        inputValidator: (value) => {
+          const normalized = normalizeName(value);
+
+          if (!("code" in normalized)) {
+            return null;
+          }
+
+          return normalized.code === "nameEmpty"
+            ? t("nameRequired")
+            : t("nameTooLong", { max: NAME_MAX_LENGTH });
+        },
         titleText: t("namePrompt"),
       });
 

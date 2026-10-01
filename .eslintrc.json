@@ -16,6 +16,12 @@
       "parserOptions": {
         "project": ["./worker/tsconfig.json"]
       }
+    },
+    {
+      "files": ["*.test.ts"],
+      "rules": {
+        "filenames/match-regex": "off"
+      }
     }
   ],
   "parser": "@typescript-eslint/parser",

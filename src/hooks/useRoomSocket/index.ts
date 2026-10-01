@@ -2,13 +2,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ClientMessage,
+  ErrorCode,
   PublicRoom,
-  ServerMessage,
+  isCardValue,
+  parseServerMessage,
   roomSocketUrl,
 } from "@/libs/protocol";
 
 export type UseRoomSocketParams = {
   create: boolean;
+  /** Worker に断られたときに呼ばれる。 */
+  onError?: (code: ErrorCode) => void;
   roomId: string;
 };
 
@@ -38,9 +42,15 @@ const MAX_RETRY_MS = 10000;
 
 export default function useRoomSocket({
   create,
+  onError,
   roomId,
 }: UseRoomSocketParams): RoomSocketData {
   const socketRef = useRef<WebSocket>();
+  // 呼び出し側が毎回新しい関数を渡しても、繋ぎ直さずに最新を呼ぶ。
+  const onErrorRef = useRef(onError);
+
+  onErrorRef.current = onError;
+
   const [room, setRoom] = useState<PublicRoom>(EMPTY_ROOM);
   const [userId, setUserId] = useState("");
   const [phase, setPhase] = useState<RoomPhase>("connecting");
@@ -83,7 +93,12 @@ export default function useRoomSocket({
       });
 
       socket.addEventListener("message", ({ data }) => {
-        const message = JSON.parse(String(data)) as ServerMessage;
+        const message = parseServerMessage(String(data));
+
+        if (!message) {
+          // 読めない電文は捨てる。次の state で場は揃う。
+          return;
+        }
 
         switch (message.type) {
           case "joined":
@@ -107,7 +122,9 @@ export default function useRoomSocket({
             setRoom(message.room);
 
             break;
-          default:
+          case "error":
+            onErrorRef.current?.(message.code);
+
             break;
         }
       });
@@ -155,7 +172,14 @@ export default function useRoomSocket({
     [send]
   );
   const vote = useCallback(
-    (value: string) => send({ value, type: "vote" }),
+    (value: string) => {
+      // 札にない値は Worker が断る。送る前に落としておく。
+      if (!isCardValue(value)) {
+        return;
+      }
+
+      send({ value, type: "vote" });
+    },
     [send]
   );
   const start = useCallback(() => send({ type: "start" }), [send]);

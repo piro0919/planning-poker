@@ -1,11 +1,21 @@
 import { DurableObject } from "cloudflare:workers";
-import type {
-  ClientMessage,
-  PublicRoom,
-  PublicUser,
-  RoomStatus,
-  ServerMessage,
+import {
+  type CardValue,
+  type ErrorCode,
+  type PublicRoom,
+  type PublicUser,
+  type RoomStatus,
+  type ServerMessage,
+  normalizeName,
+  parseClientMessage,
 } from "../../src/libs/protocol";
+import {
+  type StoredRoom,
+  type StoredUser,
+  disconnect,
+  reconnect,
+  sweep,
+} from "./state";
 
 // Env と Room は互いを参照する。型のうえだけの循環なので実害はない。
 /* eslint-disable no-use-before-define */
@@ -16,25 +26,6 @@ export type Env = {
   ROOM: DurableObjectNamespace<Room>;
 };
 /* eslint-enable no-use-before-define */
-
-type StoredUser = {
-  createdDate: string;
-  /** 切れた時刻。猶予のあいだは席を残しておく。 */
-  disconnectedAt?: number;
-  id: string;
-  name: string;
-  /** 同じ人として戻ってくるための合言葉。本人以外には配らない。 */
-  token: string;
-  value: string;
-};
-
-type StoredRoom = {
-  adminId: string;
-  createdDate: string;
-  expiresAt: number;
-  status: RoomStatus;
-  users: StoredUser[];
-};
 
 type Attachment = {
   userId: string;
@@ -74,7 +65,8 @@ export class Room extends DurableObject<Env> {
 
     const { 0: client, 1: server } = new WebSocketPair();
 
-    this.ctx.acceptWebSocket(server);
+    // 接続ごとの名札。休止から戻っても同じ接続を見分けられる。
+    this.ctx.acceptWebSocket(server, [crypto.randomUUID()]);
 
     // 入室前でも場は見える。名前を出すまでは観戦者と同じ扱いになる。
     this.send(server, { room: await this.publicRoom(""), type: "state" });
@@ -90,12 +82,10 @@ export class Room extends DurableObject<Env> {
       return;
     }
 
-    let parsed: ClientMessage;
+    const parsed = parseClientMessage(message);
 
-    try {
-      parsed = JSON.parse(message) as ClientMessage;
-    } catch {
-      this.send(ws, { message: "不正なメッセージです", type: "error" });
+    if (!parsed) {
+      this.sendError(ws, "invalidMessage");
 
       return;
     }
@@ -137,8 +127,6 @@ export class Room extends DurableObject<Env> {
         await this.vote(ws, room, parsed.value);
 
         break;
-      default:
-        this.send(ws, { message: "不明なメッセージです", type: "error" });
     }
   }
 
@@ -170,25 +158,13 @@ export class Room extends DurableObject<Env> {
     }
 
     // 猶予を過ぎて戻ってこなかった人の席を空ける。部屋の寿命は延ばさない。
-    const users = room.users.filter(
-      (user) => !user.disconnectedAt || user.disconnectedAt + this.graceMs > now
-    );
+    const next = sweep(room, this.liveUserIds(), now, this.graceMs);
 
-    if (users.length === room.users.length) {
-      await this.persist(room);
+    await this.persist(next);
 
-      return;
+    if (next.users.length !== room.users.length) {
+      await this.broadcast();
     }
-
-    await this.persist({
-      ...room,
-      users,
-      adminId: users.some((user) => user.id === room.adminId)
-        ? room.adminId
-        : users[0]?.id ?? "",
-    });
-
-    await this.broadcast();
   }
 
   private get graceMs(): number {
@@ -200,16 +176,16 @@ export class Room extends DurableObject<Env> {
     room: StoredRoom,
     name: string
   ): Promise<void> {
-    const trimmed = name.trim();
+    const normalized = normalizeName(name);
 
-    if (!trimmed) {
-      this.send(ws, { message: "お名前が空です", type: "error" });
+    if ("code" in normalized) {
+      this.sendError(ws, normalized.code);
 
       return;
     }
 
     if (this.userIdOf(ws)) {
-      this.send(ws, { message: "すでに入室しています", type: "error" });
+      this.sendError(ws, "alreadyJoined");
 
       return;
     }
@@ -217,7 +193,7 @@ export class Room extends DurableObject<Env> {
     const user: StoredUser = {
       createdDate: new Date().toISOString(),
       id: crypto.randomUUID(),
-      name: trimmed,
+      name: normalized.name,
       token: crypto.randomUUID(),
       value: "",
     };
@@ -253,16 +229,7 @@ export class Room extends DurableObject<Env> {
 
     ws.serializeAttachment({ userId: user.id } satisfies Attachment);
 
-    await this.persist(
-      this.touch({
-        ...room,
-        users: room.users.map((candidate) =>
-          candidate.id === user.id
-            ? { ...candidate, disconnectedAt: undefined }
-            : candidate
-        ),
-      })
-    );
+    await this.persist(this.touch(reconnect(room, user.id)));
 
     this.send(ws, { token: user.token, type: "joined", userId: user.id });
 
@@ -272,18 +239,18 @@ export class Room extends DurableObject<Env> {
   private async vote(
     ws: WebSocket,
     room: StoredRoom,
-    value: string
+    value: CardValue
   ): Promise<void> {
     const userId = this.userIdOf(ws);
 
     if (!userId) {
-      this.send(ws, { message: "入室していません", type: "error" });
+      this.sendError(ws, "notJoined");
 
       return;
     }
 
     if (room.status !== "start") {
-      this.send(ws, { message: "まだ開始していません", type: "error" });
+      this.sendError(ws, "notStarted");
 
       return;
     }
@@ -335,7 +302,7 @@ export class Room extends DurableObject<Env> {
     }
 
     if (!room.users.some((user) => user.id === userId)) {
-      this.send(ws, { message: "その人はもういません", type: "error" });
+      this.sendError(ws, "userGone");
 
       return;
     }
@@ -370,6 +337,7 @@ export class Room extends DurableObject<Env> {
   }
 
   // 回線が切れただけ。席は猶予のあいだ残す。
+  // 同じ人の別の接続が生きていれば、切れたことにはしない。
   private async markDisconnected(ws: WebSocket): Promise<void> {
     const userId = this.userIdOf(ws);
     const room = await this.load();
@@ -378,12 +346,35 @@ export class Room extends DurableObject<Env> {
       return;
     }
 
-    await this.persist({
-      ...room,
-      users: room.users.map((user) =>
-        user.id === userId ? { ...user, disconnectedAt: Date.now() } : user
-      ),
-    });
+    await this.persist(
+      disconnect(room, userId, this.liveUserIds(ws), Date.now())
+    );
+  }
+
+  /**
+   * 生きている接続の持ち主を集める。
+   * 閉じかけの接続と、except と同じ名札の接続は数えない。
+   *
+   * @param {WebSocket} except 数えない接続。
+   * @return {string[]} 持ち主の ID。
+   */
+  private liveUserIds(except?: WebSocket): string[] {
+    const exceptTag = except ? this.tagOf(except) : undefined;
+
+    return this.ctx
+      .getWebSockets()
+      .filter(
+        (socket) =>
+          socket !== except &&
+          socket.readyState === WebSocket.OPEN &&
+          (exceptTag === undefined || this.tagOf(socket) !== exceptTag)
+      )
+      .map((socket) => this.userIdOf(socket))
+      .filter((userId) => userId);
+  }
+
+  private tagOf(ws: WebSocket): string | undefined {
+    return this.ctx.getTags(ws)[0];
   }
 
   private assertAdmin(ws: WebSocket, room: StoredRoom): boolean {
@@ -391,7 +382,7 @@ export class Room extends DurableObject<Env> {
       return true;
     }
 
-    this.send(ws, { message: "管理者だけができます", type: "error" });
+    this.sendError(ws, "adminOnly");
 
     return false;
   }
@@ -463,6 +454,10 @@ export class Room extends DurableObject<Env> {
     } catch {
       // 閉じかけの接続に送っただけ。切断側の処理に任せる。
     }
+  }
+
+  private sendError(ws: WebSocket, code: ErrorCode): void {
+    this.send(ws, { code, type: "error" });
   }
 
   private acceptAndClose(message: ServerMessage): Response {

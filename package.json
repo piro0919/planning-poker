@@ -79,12 +79,14 @@
     "worker:dev": "wrangler dev --config worker/wrangler.jsonc",
     "worker:deploy": "wrangler deploy --config worker/wrangler.jsonc",
     "worker:type-check": "tsc -p worker/tsconfig.json",
-    "lint:worker": "eslint worker"
+    "lint:worker": "eslint worker",
+    "test": "vitest run"
   },
   "version": "0.1.0",
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260829.1",
     "@lhci/cli": "0.15.1",
+    "vitest": "3.2.7",
     "wrangler": "4.127.1"
   }
 }

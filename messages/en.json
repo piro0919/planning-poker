@@ -19,10 +19,22 @@
   "Room": {
     "connected": "Back online",
     "disconnected": "Connection lost. Reconnecting…",
+    "errors": {
+      "adminOnly": "Only the room admin can do that",
+      "alreadyJoined": "You are already in this room",
+      "invalidMessage": "The server could not accept that request",
+      "nameEmpty": "Please enter your name",
+      "nameTooLong": "That name is too long",
+      "notJoined": "You have not joined this room yet",
+      "notStarted": "Voting has not started yet",
+      "unknown": "The server could not accept that request",
+      "userGone": "That person has already left"
+    },
     "joined": "{name} joined",
     "left": "{name} left",
     "nameRequired": "Please enter your name",
     "namePrompt": "Enter your name",
+    "nameTooLong": "Names can be up to {max} characters",
     "revealed": "Cards revealed",
     "started": "Voting started"
   },
