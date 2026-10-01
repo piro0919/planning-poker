@@ -3,8 +3,9 @@ import { useTranslations } from "next-intl";
 import { CSSProperties, useMemo } from "react";
 import { FaCheckCircle, FaCrown } from "react-icons/fa";
 import { TailSpin } from "react-loader-spinner";
-import { useElementSize, useWindowSize } from "usehooks-ts";
+import { useWindowSize } from "usehooks-ts";
 import styles from "./style.module.scss";
+import useElementSize from "@/hooks/useElementSize";
 
 type User = {
   createdDate: string;
@@ -38,7 +39,10 @@ export default function Board({
         .sort(({ id }) => (userId === id ? -1 : 1)),
     [propUsers, userId]
   );
-  const { height: windowHeight, width: windowWidth } = useWindowSize();
+  // 初回は 0 扱いで描き、マウント後に実寸へ合わせる。サーバーの描画とずらさないため。
+  const { height: windowHeight = 0, width: windowWidth = 0 } = useWindowSize({
+    initializeWithValue: false,
+  });
   const repeatCount = useMemo(() => {
     const indexList = [1, 2, 3, 4];
     const memberCount = users.length;
@@ -59,7 +63,7 @@ export default function Board({
 
     return maxRepeatCount - 1;
   }, [users.length, windowHeight, windowWidth]);
-  const [ref, { height = 0, width = 0 }] = useElementSize();
+  const [ref, { height, width }] = useElementSize<HTMLDivElement>();
   const cardStyle = useMemo<CSSProperties>(
     () =>
       height / 88 > width / 63
