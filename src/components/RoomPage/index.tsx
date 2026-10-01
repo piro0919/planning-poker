@@ -163,7 +163,7 @@ export default function RoomPage({ roomId }: RoomPageProps): JSX.Element {
   }, [join, phase, t]);
 
   useEffect(
-    () => () => {
+    () => (): void => {
       MySwal.close();
     },
     []

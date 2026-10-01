@@ -49,7 +49,9 @@ export default function useRoomSocket({
   // 呼び出し側が毎回新しい関数を渡しても、繋ぎ直さずに最新を呼ぶ。
   const onErrorRef = useRef(onError);
 
-  onErrorRef.current = onError;
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   const [room, setRoom] = useState<PublicRoom>(EMPTY_ROOM);
   const [userId, setUserId] = useState("");
@@ -146,7 +148,7 @@ export default function useRoomSocket({
 
     connect(true);
 
-    return () => {
+    return (): void => {
       closedByUs = true;
 
       clearTimeout(timer);

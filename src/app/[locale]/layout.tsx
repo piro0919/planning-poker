@@ -1,4 +1,3 @@
-// eslint-disable-next-line filenames/match-exported
 import "@szhsin/react-menu/dist/index.css";
 import "@szhsin/react-menu/dist/transitions/slide.css";
 import { Analytics } from "@vercel/analytics/next";
