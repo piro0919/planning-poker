@@ -17,7 +17,7 @@ export default function Hand({
   cards,
   selectedValue,
   status,
-}: HandProps): JSX.Element {
+}: HandProps): React.JSX.Element {
   const { breakpoint } = useBreakpoint();
   const cardWidth = useMemo(
     () =>

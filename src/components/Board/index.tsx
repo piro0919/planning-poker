@@ -27,7 +27,7 @@ export default function Board({
   status,
   userId,
   users: propUsers,
-}: BoardProps): JSX.Element {
+}: BoardProps): React.JSX.Element {
   const t = useTranslations("Board");
   const tUi = useTranslations("Ui");
   const users = useMemo(

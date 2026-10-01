@@ -3,7 +3,7 @@ import { useLocale, useTranslations } from "next-intl";
 import styles from "./style.module.scss";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
-export default function LocaleSwitch(): JSX.Element {
+export default function LocaleSwitch(): React.JSX.Element {
   const locale = useLocale();
   // 読み上げ文字は切り替えた先の言葉で書く。今の言語のファイルに、
   // 切り替え先の言葉で入れてある。

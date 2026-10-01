@@ -11,11 +11,7 @@ const withPWA = require("next-pwa")({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   experimental: {
-    appDir: true,
     scrollRestoration: true,
   },
   images: {

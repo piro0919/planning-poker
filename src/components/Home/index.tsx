@@ -14,7 +14,10 @@ export type HomeProps = {
   onSubmit: SubmitHandler<FieldValues>;
 };
 
-export default function Home({ onCreate, onSubmit }: HomeProps): JSX.Element {
+export default function Home({
+  onCreate,
+  onSubmit,
+}: HomeProps): React.JSX.Element {
   const t = useTranslations("Home");
   const { handleSubmit, register } = useForm<FieldValues>({
     defaultValues: {

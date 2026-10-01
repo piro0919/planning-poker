@@ -5,16 +5,22 @@ import { toLocale } from "@/i18n/routing";
 import getMetadata from "@/libs/getMetadata";
 
 export type PageProps = {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 };
 
 export async function generateMetadata({
-  params: { locale },
+  params,
 }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+
   return getMetadata({ locale: toLocale(locale), type: "website" });
 }
 
-export default function Page({ params: { locale } }: PageProps): JSX.Element {
+export default async function Page({
+  params,
+}: PageProps): Promise<React.JSX.Element> {
+  const { locale } = await params;
+
   setRequestLocale(locale);
 
   return <HomePage />;

@@ -24,7 +24,7 @@ export default function Room({
   status,
   userId,
   users,
-}: RoomProps): JSX.Element {
+}: RoomProps): React.JSX.Element {
   const isAdmin = useMemo<ControlProps["isAdmin"]>(
     () => !!adminUserId && adminUserId === userId,
     [adminUserId, userId]

@@ -19,7 +19,7 @@ export type RoomPageProps = {
   roomId: string;
 };
 
-export default function RoomPage({ roomId }: RoomPageProps): JSX.Element {
+export default function RoomPage({ roomId }: RoomPageProps): React.JSX.Element {
   const router = useRouter();
   const t = useTranslations("Room");
   const { fibonacci } = useFibonacci();

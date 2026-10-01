@@ -30,7 +30,7 @@ export default function Control({
   status,
   userId,
   users,
-}: ControlProps): JSX.Element {
+}: ControlProps): React.JSX.Element {
   const t = useTranslations("Control");
   const tUi = useTranslations("Ui");
   const adminButton = useMemo(() => {

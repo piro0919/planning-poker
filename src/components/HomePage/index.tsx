@@ -9,7 +9,7 @@ import { useRouter } from "@/i18n/navigation";
 /** 部屋を作った本人だけが、この印を持って最初の接続に来る。 */
 const CREATE_KEY = "create-room";
 
-export default function HomePage(): JSX.Element {
+export default function HomePage(): React.JSX.Element {
   const router = useRouter();
   const t = useTranslations("Home");
   const handleCreate = useCallback<HomeProps["onCreate"]>(() => {

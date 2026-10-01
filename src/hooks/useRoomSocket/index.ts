@@ -45,7 +45,7 @@ export default function useRoomSocket({
   onError,
   roomId,
 }: UseRoomSocketParams): RoomSocketData {
-  const socketRef = useRef<WebSocket>();
+  const socketRef = useRef<WebSocket | undefined>(undefined);
   // 呼び出し側が毎回新しい関数を渡しても、繋ぎ直さずに最新を呼ぶ。
   const onErrorRef = useRef(onError);
 

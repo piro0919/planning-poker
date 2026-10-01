@@ -18,20 +18,24 @@ export function generateStaticParams(): { locale: string }[] {
 }
 
 export async function generateMetadata({
-  params: { locale },
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
+  const { locale } = await params;
+
   return getMetadata({ locale: toLocale(locale), type: "website" });
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
-}): JSX.Element {
+  params: Promise<{ locale: string }>;
+}): Promise<React.JSX.Element> {
+  const { locale } = await params;
+
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }

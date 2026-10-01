@@ -56,7 +56,7 @@ export default tseslint.config(
     },
     settings: {
       // "detect" のままだと eslint-plugin-react が ESLint 10 で落ちる。
-      react: { version: "18" },
+      react: { version: "19" },
     },
     rules: {
       "@next/next/no-html-link-for-pages": ["error", "src/app/"],
