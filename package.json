@@ -77,12 +77,12 @@
   },
   "version": "0.1.0",
   "devDependencies": {
-    "@cloudflare/workers-types": "5.20260829.1",
+    "@cloudflare/workers-types": "5.20260930.2",
     "@eslint/js": "9.39.5",
     "@lhci/cli": "0.15.1",
     "eslint-plugin-perfectionist": "5.12.1",
     "typescript-eslint": "8.71.0",
     "vitest": "5.0.3",
-    "wrangler": "4.127.1"
+    "wrangler": "4.145.0"
   }
 }
