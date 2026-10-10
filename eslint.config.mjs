@@ -6,6 +6,7 @@ import sortDestructureKeys from "eslint-plugin-sort-destructure-keys";
 import sortKeysShorthand from "eslint-plugin-sort-keys-shorthand";
 import unusedImports from "eslint-plugin-unused-imports";
 import tseslint from "typescript-eslint";
+import magicNumbers from "@piro0919/eslint-config";
 
 const TS_FILES = ["**/*.ts", "**/*.tsx"];
 
@@ -150,5 +151,7 @@ export default tseslint.config(
         },
       ],
     },
-  }
+  },
+  // 名前の無い数字を警告する（全リポジトリで共有する piro0919/eslint-config）
+  ...magicNumbers()
 );
