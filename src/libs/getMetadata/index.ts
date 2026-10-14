@@ -31,11 +31,12 @@ export default async function getMetadata({
   const url = href(locale, pathname);
   const title = t("title");
   const description = t("description");
+  // 絵は src/app/og.png/route.tsx で組んでいる。
   const image = {
     alt: title,
     height: 630,
     type: "image/png",
-    url: `${SITE_URL}/ogp-${locale}.png`,
+    url: `${SITE_URL}/og.png`,
     width: 1200,
   };
 
