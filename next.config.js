@@ -4,9 +4,10 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 const withNextIntl = require("next-intl/plugin")();
 
-const withPWA = require("next-pwa")({
-  dest: "public",
+const withSerwist = require("@serwist/next").default({
   disable: process.env.NODE_ENV === "development",
+  swDest: "public/sw.js",
+  swSrc: "src/app/sw.ts",
 });
 
 /** @type {import('next').NextConfig} */
@@ -36,7 +37,7 @@ const nextConfig = {
 };
 
 module.exports = (_, { defaultConfig }) => {
-  const plugins = [withNextIntl, withPWA, withBundleAnalyzer];
+  const plugins = [withNextIntl, withSerwist, withBundleAnalyzer];
 
   return plugins.reduce((acc, next) => next(acc), {
     ...defaultConfig,
