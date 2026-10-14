@@ -11,6 +11,8 @@ const withPWA = require("next-pwa")({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // dev を AI エージェントから走らせると、AGENTS.md と CLAUDE.md を直下に生成する。要らないので止める。
+  agentRules: false,
   experimental: {
     scrollRestoration: true,
   },

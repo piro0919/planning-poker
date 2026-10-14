@@ -15,15 +15,19 @@
   height: 100%;
   margin-top: 24px;
   position: relative;
+
   @include mq.mq($until: tablet) {
     width: calc(100% + 108px * 4);
   }
+
   @include mq.mq($from: tablet, $until: desktop) {
     width: calc(100% + 108px * 2);
   }
 }
 
 .card {
+  // button は中身を上下中央に置く。div だったときと同じく左上に寄せる。
+  align-items: flex-start;
   background: #fff;
   border-left: 2px solid #3c4043;
   border-radius: 12px 12px 0 0;
@@ -32,16 +36,23 @@
   bottom: -24px;
   /* stylelint-disable-next-line csstree/validator */
   box-shadow: -4px 4px 4px rgba(#3c4043, 0.25);
+  color: inherit;
   cursor: pointer;
+  display: flex;
   height: calc(100% + 24px);
   left: 0;
+  letter-spacing: inherit;
+  min-width: 0;
   position: absolute;
+  text-align: left;
   transform-origin: bottom;
   transition: 120ms;
+
   @include mq.mq($until: desktop) {
     font-size: 2rem;
     padding: 8px;
   }
+
   @include mq.mq($from: desktop) {
     font-size: 2.4rem;
     padding: 12px;
@@ -49,6 +60,7 @@
 }
 
 .card:hover,
+.card:focus-visible,
 .selected {
   margin-bottom: 24px;
 }
