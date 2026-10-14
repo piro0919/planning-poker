@@ -39,6 +39,38 @@ jobs:
       # Service Worker（src/app/sw.ts）はビルドのときにしか作られない。
       - run: npm run build
 
+  # 画面をビルドし、部屋を手元の Worker（wrangler dev）に置いて、パソコンとスマホの幅で確かめる。
+  # 立ち上げ方は playwright.config.ts。
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: npm
+      - run: npm ci
+      # ブラウザは Playwright の版ごとに残す。残っていれば、OS の部品だけ入れる。
+      - id: playwright
+        run: echo "version=$(npx playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+      - id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      - if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - run: npm run test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright
+          path: test-results/
+          retention-days: 7
+
   # 速い確かめを待たせないよう、別の仕事にする。閾値は .lighthouserc.json。
   # performance だけ warn なので、数字の揺れでは落ちない。
   lighthouse:

@@ -10,6 +10,12 @@
 
 # next.js
 /.next/
+/.next-e2e/
+
+# playwright
+/test-results/
+/playwright-report/
+/.playwright-mcp/
 /out/
 
 # production

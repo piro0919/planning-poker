@@ -12,6 +12,9 @@ const withSerwist = require("@serwist/next").default({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // e2e のビルドは別のフォルダに作る（playwright.config.ts が NEXT_DIST_DIR を渡す）。
+  // 同じ .next に作ると、手元で動かしている開発サーバーの中身を上書きしてしまう。
+  distDir: process.env.NEXT_DIST_DIR ?? ".next",
   // dev を AI エージェントから走らせると、AGENTS.md と CLAUDE.md を直下に生成する。要らないので止める。
   agentRules: false,
   experimental: {
