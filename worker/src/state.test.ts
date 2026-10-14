@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { type StoredRoom, disconnect, reconnect, sweep } from "./state";
+import {
+  type StoredRoom,
+  disconnect,
+  reconnect,
+  revealIfAllVoted,
+  sweep,
+} from "./state";
 
 const GRACE_MS = 60_000;
 
 function roomWith(
-  users: Array<{ disconnectedAt?: number; id: string }>
+  users: Array<{ disconnectedAt?: number; id: string; value?: string }>
 ): StoredRoom {
   return {
     adminId: users[0]?.id ?? "",
@@ -102,5 +108,52 @@ describe("sweep", () => {
     const room = roomWith([{ disconnectedAt: 0, id: "a" }]);
 
     expect(sweep(room, [], GRACE_MS, GRACE_MS).adminId).toBe("");
+  });
+
+  it("reveals when the only user yet to vote is swept away", () => {
+    const room = {
+      ...roomWith([
+        { id: "a", value: "3" },
+        { disconnectedAt: 0, id: "b" },
+      ]),
+      status: "start" as const,
+    };
+
+    expect(sweep(room, ["a"], GRACE_MS, GRACE_MS).status).toBe("wait");
+  });
+});
+
+describe("revealIfAllVoted", () => {
+  it("reveals once everyone has voted", () => {
+    const room = {
+      ...roomWith([
+        { id: "a", value: "3" },
+        { id: "b", value: "5" },
+      ]),
+      status: "start" as const,
+    };
+
+    expect(revealIfAllVoted(room).status).toBe("wait");
+  });
+
+  it("keeps voting while someone has not voted", () => {
+    const room = {
+      ...roomWith([{ id: "a", value: "3" }, { id: "b" }]),
+      status: "start" as const,
+    };
+
+    expect(revealIfAllVoted(room).status).toBe("start");
+  });
+
+  it("does not reveal an empty room", () => {
+    const room = { ...roomWith([]), status: "start" as const };
+
+    expect(revealIfAllVoted(room).status).toBe("start");
+  });
+
+  it("leaves a room that is not voting alone", () => {
+    const room = roomWith([{ id: "a", value: "3" }]);
+
+    expect(revealIfAllVoted(room).status).toBe("reserve");
   });
 });

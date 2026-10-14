@@ -6,14 +6,12 @@ import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import Room, { RoomProps } from "@/components/Room";
-import useFibonacci from "@/hooks/useFibonacci";
 import useRoomSocket, { UseRoomSocketParams } from "@/hooks/useRoomSocket";
 import { useRouter } from "@/i18n/navigation";
-import { NAME_MAX_LENGTH, normalizeName } from "@/libs/protocol";
+import { takeRoomCreated } from "@/libs/createRoom";
+import { DECK, NAME_MAX_LENGTH, normalizeName } from "@/libs/protocol";
 
 const MySwal = withReactContent(Swal);
-/** 部屋を作った本人だけが、この印を持って最初の接続に来る。 */
-const CREATE_KEY = "create-room";
 
 export type RoomPageProps = {
   roomId: string;
@@ -22,17 +20,12 @@ export type RoomPageProps = {
 export default function RoomPage({ roomId }: RoomPageProps): React.JSX.Element {
   const router = useRouter();
   const t = useTranslations("Room");
-  const { fibonacci } = useFibonacci();
   const [create] = useState(() => {
     if (typeof window === "undefined") {
       return false;
     }
 
-    const created = window.sessionStorage.getItem(CREATE_KEY) === roomId;
-
-    window.sessionStorage.removeItem(CREATE_KEY);
-
-    return created;
+    return takeRoomCreated(roomId);
   });
   const handleError = useCallback<NonNullable<UseRoomSocketParams["onError"]>>(
     (code) => {
@@ -69,13 +62,13 @@ export default function RoomPage({ roomId }: RoomPageProps): React.JSX.Element {
   const prevUsers = usePrevious(users);
   const cards = useMemo<RoomProps["cards"]>(
     () =>
-      fibonacci.map((value) => ({
+      DECK.map((value) => ({
         value,
         onSelect: (): void => {
           vote(value);
         },
       })),
-    [fibonacci, vote]
+    [vote]
   );
   const selectedValue = useMemo<RoomProps["selectedValue"]>(
     () => users.find(({ id }) => userId === id)?.value || "",
@@ -174,21 +167,28 @@ export default function RoomPage({ roomId }: RoomPageProps): React.JSX.Element {
       return;
     }
 
-    const isEnter = users.length - prevUsers.length > 0;
-    const { usersA, usersB } = isEnter
-      ? { usersA: users, usersB: prevUsers }
-      : { usersA: prevUsers, usersB: users };
+    // 入った人と抜けた人は別々に数える。同じ回に両方が起きても取りこぼさない。
+    const others = (list: RoomProps["users"]): RoomProps["users"] =>
+      list.filter(({ id }) => userId !== id);
+    const missingFrom = (
+      list: RoomProps["users"],
+      from: RoomProps["users"]
+    ): RoomProps["users"] =>
+      others(list).filter(({ id }) => !from.some((user) => user.id === id));
 
-    usersA
-      .filter(({ id }) => userId !== id)
-      .filter(({ id }) => !usersB.some(({ id: prevId }) => id === prevId))
-      .forEach(({ name }) => {
-        toast.success(isEnter ? t("joined", { name }) : t("left", { name }));
-      });
+    missingFrom(users, prevUsers).forEach(({ name }) => {
+      toast.success(t("joined", { name }));
+    });
+    missingFrom(prevUsers, users).forEach(({ name }) => {
+      toast.success(t("left", { name }));
+    });
   }, [prevUsers, t, userId, users]);
 
+  const prevStatus = usePrevious(room.status);
+
   useEffect(() => {
-    if (!userId) {
+    // 状態が変わったときだけ知らせる。入室や繋ぎ直しで同じ状態を受け取っても黙る。
+    if (!userId || prevStatus === undefined || prevStatus === room.status) {
       return;
     }
 
@@ -201,7 +201,7 @@ export default function RoomPage({ roomId }: RoomPageProps): React.JSX.Element {
     if (room.status === "wait") {
       toast.success(t("revealed"));
     }
-  }, [room.status, t, userId]);
+  }, [prevStatus, room.status, t, userId]);
 
   return (
     <Room

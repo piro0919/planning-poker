@@ -108,12 +108,31 @@ export function sweep(
       liveUserIds.includes(user.id) ? withoutDisconnectedAt(user) : user
     );
 
-  return {
+  return revealIfAllVoted({
     ...room,
     users,
     // 管理者が消えたら、いちばん古くからいる人に引き継ぐ。
     adminId: users.some((user) => user.id === room.adminId)
       ? room.adminId
       : users[0]?.id ?? "",
-  };
+  });
+}
+
+/**
+ * 投票中に全員が出し終わっていれば公開する。誰かが押す必要はない。
+ * 票が入ったときだけでなく、まだ出していない人が抜けたときにも呼ぶ。
+ *
+ * @param {StoredRoom} room いまの部屋。
+ * @return {StoredRoom} 次の部屋。
+ */
+export function revealIfAllVoted(room: StoredRoom): StoredRoom {
+  if (
+    room.status !== "start" ||
+    !room.users.length ||
+    !room.users.every((user) => user.value)
+  ) {
+    return room;
+  }
+
+  return { ...room, status: "wait" };
 }

@@ -1,5 +1,4 @@
 import { Menu, MenuButton, MenuItem, MenuItemProps } from "@szhsin/react-menu";
-import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
 import { MouseEventHandler, useMemo } from "react";
 import { FaCrown } from "react-icons/fa";
@@ -95,9 +94,7 @@ export default function Control({
     () =>
       users
         .filter(({ id }) => userId !== id)
-        .sort(({ createdDate: createdDateA }, { createdDate: createdDateB }) =>
-          dayjs(createdDateA).isBefore(createdDateB) ? -1 : 1
-        )
+        .sort((a, b) => a.createdDate.localeCompare(b.createdDate))
         .map(({ id, name, onClick }) => (
           <MenuItem key={id} onClick={onClick} value={id}>
             {tUi("userName", { name })}

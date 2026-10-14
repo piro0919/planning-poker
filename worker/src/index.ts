@@ -14,18 +14,18 @@ import {
   type StoredUser,
   disconnect,
   reconnect,
+  revealIfAllVoted,
   sweep,
 } from "./state";
 
 // Env と Room は互いを参照する。型のうえだけの循環なので実害はない。
-/* eslint-disable no-use-before-define */
+
 export type Env = {
   ALLOWED_ORIGINS: string;
   /** 猶予の既定を上書きする。試験のためだけに使う。 */
   GRACE_MS?: string;
   ROOM: DurableObjectNamespace<Room>;
 };
-/* eslint-enable no-use-before-define */
 
 type Attachment = {
   userId: string;
@@ -45,7 +45,15 @@ export class Room extends DurableObject<Env> {
 
     const shouldCreate =
       new URL(request.url).searchParams.get("create") === "1";
-    const room = await this.load();
+
+    let room = await this.load();
+
+    // アラームが張れずに残った期限切れの部屋は、開かれたときに消す。
+    if (room && room.expiresAt <= Date.now()) {
+      await this.ctx.storage.deleteAll();
+
+      room = undefined;
+    }
 
     if (!room && !shouldCreate) {
       return this.acceptAndClose({ type: "notFound" });
@@ -258,12 +266,8 @@ export class Room extends DurableObject<Env> {
     const users = room.users.map((user) =>
       user.id === userId ? { ...user, value } : user
     );
-    // 全員が出し終わったら、その場で公開する。誰かが押す必要はない。
-    const status: RoomStatus = users.every((user) => user.value)
-      ? "wait"
-      : "start";
 
-    await this.persist(this.touch({ ...room, status, users }));
+    await this.persist(this.touch(revealIfAllVoted({ ...room, users })));
 
     await this.broadcast();
   }
@@ -325,12 +329,14 @@ export class Room extends DurableObject<Env> {
     const users = room.users.filter((user) => user.id !== userId);
 
     await this.persist(
-      this.touch({
-        ...room,
-        users,
-        // 管理者が抜けたら、いちばん古くからいる人に引き継ぐ。
-        adminId: room.adminId === userId ? users[0]?.id ?? "" : room.adminId,
-      })
+      this.touch(
+        revealIfAllVoted({
+          ...room,
+          users,
+          // 管理者が抜けたら、いちばん古くからいる人に引き継ぐ。
+          adminId: room.adminId === userId ? users[0]?.id ?? "" : room.adminId,
+        })
+      )
     );
 
     await this.broadcast();
@@ -394,7 +400,11 @@ export class Room extends DurableObject<Env> {
   }
 
   private async load(): Promise<StoredRoom | undefined> {
-    return await this.ctx.storage.get<StoredRoom>(ROOM_KEY);
+    const room = await this.ctx.storage.get<StoredRoom>(ROOM_KEY);
+
+    // expiresAt を持たない部屋は、寿命を入れる前に作られたもの。
+    // そのままだとアラームの時刻が NaN になって張れない。期限切れとして扱い、次のアラームで消す。
+    return room && { ...room, expiresAt: room.expiresAt ?? 0 };
   }
 
   // 誰かが触ったしるし。放置された部屋だけが消える。

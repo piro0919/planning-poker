@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
 import { CSSProperties, useMemo } from "react";
 import { FaCheckCircle, FaCrown } from "react-icons/fa";
@@ -32,11 +31,19 @@ export default function Board({
   const tUi = useTranslations("Ui");
   const users = useMemo(
     () =>
-      propUsers
-        .sort(({ createdDate: createdDateA }, { createdDate: createdDateB }) =>
-          dayjs(createdDateA).isBefore(createdDateB) ? 1 : -1
-        )
-        .sort(({ id }) => (userId === id ? -1 : 1)),
+      // 自分を先頭に、残りは新しく入った順に並べる。受け取った配列は書き換えない。
+      // createdDate は ISO 8601 の UTC なので、文字列のまま比べれば時刻順になる。
+      [...propUsers].sort((a, b) => {
+        if (a.id === userId) {
+          return -1;
+        }
+
+        if (b.id === userId) {
+          return 1;
+        }
+
+        return b.createdDate.localeCompare(a.createdDate);
+      }),
     [propUsers, userId]
   );
   // 初回は 0 扱いで描き、マウント後に実寸へ合わせる。サーバーの描画とずらさないため。

@@ -5,9 +5,7 @@ import { useCallback } from "react";
 import toast from "react-hot-toast";
 import Home, { HomeProps } from "@/components/Home";
 import { useRouter } from "@/i18n/navigation";
-
-/** 部屋を作った本人だけが、この印を持って最初の接続に来る。 */
-const CREATE_KEY = "create-room";
+import { markRoomCreated } from "@/libs/createRoom";
 
 export default function HomePage(): React.JSX.Element {
   const router = useRouter();
@@ -16,7 +14,7 @@ export default function HomePage(): React.JSX.Element {
     const roomId = window.crypto.randomUUID();
 
     // 部屋の実体は、この印を持った接続が届いたときに Worker 側で作られる。
-    window.sessionStorage.setItem(CREATE_KEY, roomId);
+    markRoomCreated(roomId);
 
     copy(`${window.location.origin}/rooms/${roomId}`);
 
