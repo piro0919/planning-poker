@@ -25,6 +25,7 @@
       display: none;
     }
   }
+
   @include mq.mq($from: tablet) {
     align-items: center;
     display: flex;

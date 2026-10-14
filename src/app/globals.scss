@@ -2,6 +2,7 @@ html {
   @include mq.mq($until: tablet) {
     font-size: 56.25%;
   }
+
   @include mq.mq($from: tablet) {
     font-size: 62.5%;
   }

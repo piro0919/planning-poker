@@ -33,51 +33,49 @@ export async function GET(): Promise<ImageResponse> {
   );
 
   return new ImageResponse(
-    (
-      <div
-        style={{
-          alignItems: "center",
-          background: `radial-gradient(circle at 50% 38%, #4a90f0 0%, ${BLUE} 45%, #1459b8 100%)`,
-          display: "flex",
-          flexDirection: "column",
-          fontFamily: "Courgette",
-          height: "100%",
-          justifyContent: "center",
-          width: "100%",
-        }}
-      >
-        <div style={{ alignItems: "center", display: "flex" }}>
-          <Back rotate={-10} />
-          <div
-            style={{
-              alignItems: "center",
-              background: "#fff",
-              borderRadius: 20,
-              boxShadow: "0 24px 48px rgba(8, 40, 100, 0.35)",
-              color: BLUE,
-              display: "flex",
-              fontSize: 140,
-              height: 236,
-              justifyContent: "center",
-              width: 168,
-            }}
-          >
-            5
-          </div>
-          <Back rotate={10} />
-        </div>
+    <div
+      style={{
+        alignItems: "center",
+        background: `radial-gradient(circle at 50% 38%, #4a90f0 0%, ${BLUE} 45%, #1459b8 100%)`,
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: "Courgette",
+        height: "100%",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
+      <div style={{ alignItems: "center", display: "flex" }}>
+        <Back rotate={-10} />
         <div
           style={{
-            color: "#fff",
-            fontSize: 88,
-            letterSpacing: 1,
-            marginTop: 56,
+            alignItems: "center",
+            background: "#fff",
+            borderRadius: 20,
+            boxShadow: "0 24px 48px rgba(8, 40, 100, 0.35)",
+            color: BLUE,
+            display: "flex",
+            fontSize: 140,
+            height: 236,
+            justifyContent: "center",
+            width: 168,
           }}
         >
-          Planning Poker
+          5
         </div>
+        <Back rotate={10} />
       </div>
-    ),
+      <div
+        style={{
+          color: "#fff",
+          fontSize: 88,
+          letterSpacing: 1,
+          marginTop: 56,
+        }}
+      >
+        Planning Poker
+      </div>
+    </div>,
     {
       ...size,
       fonts: [{ data: courgette, name: "Courgette", weight: 400 }],

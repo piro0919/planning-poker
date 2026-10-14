@@ -1,8 +1,10 @@
 .list {
   display: grid;
+
   @include mq.mq($until: tablet) {
     gap: 12px;
   }
+
   @include mq.mq($from: tablet) {
     gap: 24px;
   }
@@ -34,7 +36,6 @@
   /* stylelint-disable-next-line csstree/validator */
   box-shadow: -4px 4px 4px rgba(#3c4043, 0.25);
   display: flex;
-  font-size: 2.4rem;
   font-size: 4rem;
   justify-content: center;
   padding: 12px;

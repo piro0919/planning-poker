@@ -114,7 +114,7 @@ export function sweep(
     // 管理者が消えたら、いちばん古くからいる人に引き継ぐ。
     adminId: users.some((user) => user.id === room.adminId)
       ? room.adminId
-      : users[0]?.id ?? "",
+      : (users[0]?.id ?? ""),
   });
 }
 

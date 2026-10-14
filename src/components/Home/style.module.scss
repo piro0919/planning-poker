@@ -3,10 +3,12 @@
   display: flex;
   height: 100dvh;
   justify-content: center;
+
   @include mq.mq($until: tablet) {
     padding-left: 12px;
     padding-right: 12px;
   }
+
   @include mq.mq($from: tablet) {
     padding-left: 24px;
     padding-right: 24px;
@@ -38,10 +40,12 @@
   display: grid;
   padding-left: 24px;
   padding-right: 24px;
+
   @include mq.mq($until: tablet) {
     gap: 12px;
     grid-template-columns: minmax(100%, 360px);
   }
+
   @include mq.mq($from: tablet) {
     gap: 24px;
     grid-template-columns: 240px auto 360px;

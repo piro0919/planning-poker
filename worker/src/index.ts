@@ -334,7 +334,8 @@ export class Room extends DurableObject<Env> {
           ...room,
           users,
           // 管理者が抜けたら、いちばん古くからいる人に引き継ぐ。
-          adminId: room.adminId === userId ? users[0]?.id ?? "" : room.adminId,
+          adminId:
+            room.adminId === userId ? (users[0]?.id ?? "") : room.adminId,
         })
       )
     );

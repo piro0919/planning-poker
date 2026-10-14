@@ -2,15 +2,13 @@
   "extends": [
     "stylelint-config-recommended-scss",
     "stylelint-config-css-modules",
-    "stylelint-config-sass-guidelines",
-    "stylelint-config-prettier-scss"
+    "stylelint-config-sass-guidelines"
   ],
   "plugins": [
     "stylelint-css-modules-no-global-scoped-selector",
     "stylelint-csstree-validator",
     "stylelint-declaration-block-no-ignored-properties",
-    "stylelint-order",
-    "stylelint-sass-render-errors"
+    "stylelint-order"
   ],
   "rules": {
     "css-modules/no-global-scoped-selector": [
@@ -22,10 +20,9 @@
     "csstree/validator": {
       "syntaxExtensions": ["sass"]
     },
-    "declaration-block-trailing-semicolon": "always",
     "order/properties-alphabetical-order": true,
     "plugin/declaration-block-no-ignored-properties": true,
-    "plugin/sass-render-errors": null,
-    "selector-class-pattern": null
+    "selector-class-pattern": null,
+    "@stylistic/string-quotes": null
   }
 }

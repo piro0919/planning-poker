@@ -1,5 +1,4 @@
 @use "@/app/breakpoints" as *;
-
 @forward "sass-mq" with (
   $breakpoints: $breakpoints
 );
