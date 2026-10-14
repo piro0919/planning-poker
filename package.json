@@ -48,7 +48,6 @@
     "sweetalert2-react-content": "5.1.2",
     "typescript": "5.9.3",
     "use-breakpoint": "3.1.1",
-    "use-on-snapshot": "0.2.0",
     "usehooks-ts": "3.1.1"
   },
   "engines": {
@@ -68,7 +67,7 @@
     "start": "next start",
     "stylelint-check": "stylelint-config-prettier-scss-check",
     "type-check": "tsc --noemit",
-    "lighthouse": "pnpm build && lhci autorun",
+    "lighthouse": "npm run build && lhci autorun",
     "worker:dev": "wrangler dev --config worker/wrangler.jsonc",
     "worker:deploy": "wrangler deploy --config worker/wrangler.jsonc",
     "worker:type-check": "tsc -p worker/tsconfig.json",
