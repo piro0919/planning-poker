@@ -1,3 +1,9 @@
 {
+  "overrides": [
+    {
+      "files": "*.jsonc",
+      "options": { "trailingComma": "none" }
+    }
+  ],
   "trailingComma": "es5"
 }

@@ -16,7 +16,7 @@ export type UseRoomSocketParams = {
   roomId: string;
 };
 
-export type RoomPhase = "connecting" | "joined" | "naming" | "notFound";
+type RoomPhase = "connecting" | "joined" | "naming" | "notFound";
 
 export type RoomSocketData = {
   connected: boolean;

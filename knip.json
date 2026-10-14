@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/app/sw.ts", "worker/src/index.ts"],
+  "project": ["src/**/*.{ts,tsx}", "worker/src/**/*.ts"],
+  "ignoreDependencies": [
+    "@secretlint/secretlint-rule-preset-recommend",
+    "cloudflare",
+    "sass-mq"
+  ]
+}

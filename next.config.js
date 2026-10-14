@@ -17,6 +17,20 @@ const nextConfig = {
   experimental: {
     scrollRestoration: true,
   },
+  async headers() {
+    return [
+      {
+        headers: [
+          // ほかのサイトの枠に入れさせない。
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+        source: "/:path*",
+      },
+    ];
+  },
   images: {
     unoptimized: true,
   },

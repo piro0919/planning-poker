@@ -1,13 +1,24 @@
+# main には直接 push しているので、push でも回す。プルリクエストだけだと一度も走らない。
+# 依存の更新（Renovate）の PR は手元のフックを通らないので、ここが唯一の確かめになる。
 name: CI
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,6 +28,35 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run lint:worker
+      - run: npm run lint:style:check
+      - run: npm run format:check
+      - run: npm run lint:secret
       - run: npm run type-check
       - run: npm run worker:type-check
       - run: npm test
+      # 使われていないファイル・export・パッケージ。
+      - run: npm run knip
+      # Service Worker（src/app/sw.ts）はビルドのときにしか作られない。
+      - run: npm run build
+
+  # 速い確かめを待たせないよう、別の仕事にする。閾値は .lighthouserc.json。
+  # performance だけ warn なので、数字の揺れでは落ちない。
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: npm
+      - run: npm ci
+      - run: npm run lighthouse
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          # .lighthouseci は隠しディレクトリ。これを立てないと中身が上がらないまま緑になる。
+          include-hidden-files: true
+          name: lighthouse
+          path: .lighthouseci
+          retention-days: 7
