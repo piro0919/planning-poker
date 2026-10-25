@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24.18.0
+          node-version: 24.22.1
           cache: npm
       - run: npm ci
       - run: npm run lint
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24.18.0
+          node-version: 24.22.1
           cache: npm
       - run: npm ci
       # ブラウザは Playwright の版ごとに残す。残っていれば、OS の部品だけ入れる。
@@ -80,7 +80,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24.18.0
+          node-version: 24.22.1
           cache: npm
       - run: npm ci
       - run: npm run lighthouse
