@@ -88,7 +88,7 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.72.1",
     "vitest": "5.0.5",
-    "wrangler": "4.154.0"
+    "wrangler": "4.155.0"
   },
   "overrides": {
     "stylelint-css-modules-no-global-scoped-selector": {
