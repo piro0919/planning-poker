@@ -10,6 +10,6 @@ export default function useBreakpoint(): BreakpointData {
   const { breakpoint } = useOriginBreakpoint(BREAKPOINTS);
 
   return {
-    breakpoint,
+    breakpoint: breakpoint ?? undefined,
   };
 }

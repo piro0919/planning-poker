@@ -16,7 +16,8 @@ export default function HomePage(): React.JSX.Element {
     // 部屋の実体は、この印を持った接続が届いたときに Worker 側で作られる。
     markRoomCreated(roomId);
 
-    copy(`${window.location.origin}/rooms/${roomId}`);
+    // eslint-disable-next-line no-void
+    void copy(`${window.location.origin}/rooms/${roomId}`);
 
     toast.success(t("urlCopied"));
 
