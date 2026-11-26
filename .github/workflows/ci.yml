@@ -51,18 +51,8 @@ jobs:
           node-version: 24.22.3
           cache: npm
       - run: npm ci
-      # ブラウザは Playwright の版ごとに残す。残っていれば、OS の部品だけ入れる。
-      - id: playwright
-        run: echo "version=$(npx playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
-      - id: playwright-cache
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
-      - if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-      - if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+      # Chrome 本体を入れる。Chrome for Testing は使わない
+      - run: npx playwright install --with-deps chrome
       - run: npm run test:e2e
       - if: failure()
         uses: actions/upload-artifact@v7

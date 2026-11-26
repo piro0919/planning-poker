@@ -19,7 +19,12 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
   retries: process.env.CI ? 1 : 0,
   testDir: "./e2e",
-  use: { baseURL, locale: "ja-JP", trace: "retain-on-failure" },
+  use: {
+    baseURL,
+    channel: "chrome",
+    locale: "ja-JP",
+    trace: "retain-on-failure",
+  },
   webServer: [
     {
       command: `npx wrangler dev --config worker/wrangler.jsonc --port ${WORKER_PORT} --var ALLOWED_ORIGINS:${baseURL}`,
